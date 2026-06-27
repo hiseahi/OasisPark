@@ -1,0 +1,2814 @@
+<!DOCTYPE html>
+<html class="light" lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>个人中心 | Oasis城市绿洲</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.geekzu.org/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      background: linear-gradient(to bottom, #1B3C35 0%, #1B3C35 8%, #f8fbf8 8%, #ffffff 100%);
+      background-attachment: fixed;
+    }
+   .organic-sm { 
+  border-radius: 1.5rem; 
+}
+.tab-active{
+  color: #609d7f;
+  border-bottom: 2px solid #609d7f;
+}
+.scroll-x{
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.scroll-x::-webkit-scrollbar{
+  display: none;
+}
+    
+</style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "y2k-pink": "#ff85c0",
+            "y2k-cyan": "#00f5ff",
+            "deep-green":"#1B3C35",
+            "light-green":"#609d7f"
+          },
+          borderRadius: {"full": "9999px"},
+        },
+      },
+    }
+</script>
+</head>
+<body class="text-gray-800">
+
+<!-- 顶部导航栏 -->
+<nav class="flex justify-between items-center px-6 w-full fixed top-0 left-0 right-0 z-50 bg-deep-green py-4">
+<div class="text-[48px] font-black text-y2k-pink">oasis</div>
+<div class="hidden md:flex items-center rounded-full mx-auto px-8 gap-20 py-1 bg-white/80 backdrop-blur-lg shadow-lg min-w-[700px] justify-center">
+    <a class="text-y2k-pink font-semibold px-4 py-2 rounded-[20px] hover:bg-y2k-pink hover:text-white transition-all" href="index.html">首页</a>
+    <a class="text-y2k-pink font-semibold px-4 py-2 rounded-[20px] hover:bg-y2k-pink hover:text-white transition-all" href="探索.html">探索</a>
+    <a class="text-y2k-pink font-semibold px-4 py-2 rounded-[20px] hover:bg-y2k-pink hover:text-white transition-all" href="寻找公园.html">寻找公园</a>
+    <a class="text-y2k-pink font-semibold px-4 py-2 rounded-[20px] hover:bg-y2k-pink hover:text-white transition-all" href="社区.html">社区</a>
+    <a class="text-y2k-pink font-semibold px-4 py-2 rounded-[20px] hover:bg-y2k-pink hover:text-white transition-all" href="我的足迹.html">我的足迹</a>
+</div>
+<div class="flex items-center gap-5">
+    <span class="text-white text-sm cursor-pointer hover:text-y2k-pink"><i class="fas fa-bell"></i> 通知</span>
+    <span class="text-white text-sm cursor-pointer hover:text-y2k-pink" id="settingTopBtn"><i class="fas fa-cog"></i> 设置</span>
+    <div class="w-10 h-10 rounded-full bg-white overflow-hidden">
+        <img id="topAvatar" src="https://picsum.photos/id/64/100/100" class="w-full h-full object-cover">
+    </div>
+</div>
+</nav>
+
+<main class="pt-40 px-6 max-w-7xl mx-auto pb-24">
+    <!-- 未登录状态 -->
+    <div id="notLoggedIn" class="text-center py-20">
+        <div class="text-6xl mb-4">🌿</div>
+        <h2 class="text-2xl font-bold text-deep-green mb-2">还没有登录</h2>
+        <p class="text-gray-500 mb-6">登录后可以收藏公园、发布帖子、记录足迹</p>
+        <button id="showLoginBtn" class="bg-light-green text-white px-8 py-3 rounded-full hover:opacity-90 transition">立即登录 / 注册</button>
+    </div>
+
+    <!-- 已登录状态（默认隐藏） -->
+    <div id="loggedIn" class="hidden">
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-6 mb-10">
+            <div class="w-28 h-28 rounded-full overflow-hidden border-3 border-light-green">
+                <img id="profileAvatar" src="https://picsum.photos/id/64/200/200" class="w-full h-full object-cover">
+            </div>
+            <div class="flex-1">
+                <div class="flex items-center justify-between">
+                        <div>
+                            <h2 id="profileName" class="text-[28px] font-bold text-deep-green">加载中...</h2>
+                            <p id="profileEmail" class="text-sm text-gray-500 mt-1">邮箱加载中...</p>
+                            <p id="profileBio" class="text-sm text-gray-600 mt-2 italic">这个人很懒，还没写简介~</p>
+                        </div>
+                        <button id="editBtn" class="px-5 py-2 border border-light-green rounded-full text-light-green hover:bg-light-green/5">编辑资料</button>
+                    </div>
+                    <div class="flex items-center gap-8 mt-5">
+                        <div class="text-center cursor-pointer" id="followBtn">
+                            <div id="followCount" class="text-xl font-bold">165</div>
+                            <div class="text-sm text-gray-500">关注</div>
+                        </div>
+                        <div class="text-center cursor-pointer" id="fansBtn">
+                            <div id="fansCount" class="text-xl font-bold">28</div>
+                            <div class="text-sm text-gray-500">粉丝</div>
+                        </div>
+                        <div class="text-center">
+                            <div id="likeCount" class="text-xl font-bold">223</div>
+                            <div class="text-sm text-gray-500">获赞与收藏</div>
+                        </div>
+                        <!-- ✅ 私信按钮放在 flex 容器内部，与其他统计项平级 -->
+                        <a href="私信.html" class="flex items-center gap-2 px-4 py-2 rounded-full bg-light-green/10 text-light-green hover:bg-light-green/20 transition border border-light-green/30">
+                            <i class="fas fa-envelope"></i>
+                            <span class="text-sm">私信</span>
+                            <span id="msgBadge" class="bg-red-500 text-white text-[10px] rounded-full px-1.5 py-0.5 hidden">0</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex border-b border-gray-200 mb-8">
+            <div class="tab-item px-8 py-4 text-lg cursor-pointer tab-active" data-tab="post">我的帖子</div>
+            <div class="tab-item px-8 py-4 text-lg cursor-pointer text-gray-500 hover:text-light-green" data-tab="collect">收藏</div>
+            <div class="tab-item px-8 py-4 text-lg cursor-pointer text-gray-500 hover:text-light-green" data-tab="record">我的打卡</div>
+        </div>
+
+        <div class="flex justify-end mb-4">
+            <button id="logoutBtn" class="text-red-500 text-sm hover:text-red-700 transition">退出登录</button>
+        </div>
+
+        <div id="tab-post" class="tab-content">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="myPostWrap"></div>
+        </div>
+
+        <div id="tab-collect" class="tab-content hidden">
+            <div class="mb-10">
+                <h3 class="text-lg font-bold mb-4 text-deep-green"><i class="fas fa-map-marker-alt text-light-green mr-2"></i>收藏公园</h3>
+                <div class="scroll-x flex gap-5 pb-3" id="collectParkWrap"></div>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold mb-4 text-deep-green"><i class="fas fa-bookmark text-light-green mr-2"></i>收藏帖子</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="collectPostWrap"></div>
+            </div>
+        </div>
+
+        <div id="tab-record" class="tab-content hidden">
+            <div class="flex flex-col gap-5" id="myRecordWrap"></div>
+        </div>
+    </div>
+</main>
+
+<!-- 隐私设置弹窗 -->
+<div id="settingMask" class="fixed inset-0 bg-black/40 z-[999] hidden flex items-center justify-center">
+    <div class="organic-sm bg-white w-[460px] p-7 shadow-lg">
+        <h3 class="text-xl font-bold text-deep-green mb-6">隐私设置</h3>
+        <p class="text-sm text-gray-500 mb-4">选择我的帖子默认可见范围</p>
+        <div class="flex flex-col gap-4 mb-8">
+            <label class="flex items-center gap-3 cursor-pointer">
+                <input type="radio" name="scope" value="public" checked class="w-4 h-4 accent-light-green">
+                <span>公开 · 全部用户均可浏览我的帖子</span>
+            </label>
+            <label class="flex items-center gap-3 cursor-pointer">
+                <input type="radio" name="scope" value="private" class="w-4 h-4 accent-light-green">
+                <span>私密 · 仅本人能查看全部帖子</span>
+            </label>
+        </div>
+        <div class="flex justify-end gap-4">
+            <button id="setCancel" class="px-6 py-2.5 border border-gray-300 rounded-full">取消</button>
+            <button id="setSave" class="px-6 py-2.5 bg-light-green text-white rounded-full hover:opacity-95">保存设置</button>
+        </div>
+    </div>
+</div>
+
+<!-- 关注&粉丝弹窗 -->
+<div id="userListMask" class="fixed inset-0 bg-black/40 z-[999] hidden flex items-center justify-center">
+    <div class="organic-sm bg-white w-[420px] max-h-[75vh] flex flex-col shadow-lg overflow-hidden">
+        <div class="flex border-b border-gray-200">
+            <div class="user-tab px-6 py-4 cursor-pointer text-light-green border-b-2 border-light-green" data-type="follow">我的关注</div>
+            <div class="user-tab px-6 py-4 cursor-pointer text-gray-500" data-type="fans">我的粉丝</div>
+        </div>
+        <div id="userListWrap" class="flex-1 overflow-y-auto p-5"></div>
+        <div class="p-4 border-t border-gray-100 text-center">
+            <button id="userListClose" class="px-6 py-2 border border-gray-300 rounded-full">关闭</button>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑资料弹窗 -->
+<div id="editMask" class="fixed inset-0 bg-black/40 z-[999] hidden flex items-center justify-center">
+    <div class="organic-sm bg-white w-[520px] p-7 shadow-lg">
+        <h3 class="text-xl font-bold text-deep-green mb-6">编辑个人资料</h3>
+        <div class="flex items-center gap-5 mb-6">
+            <div class="w-24 h-24 rounded-full overflow-hidden border-2 border-light-green shrink-0">
+                <img id="previewAvatar" src="https://picsum.photos/id/64/200/200" class="w-full h-full object-cover">
+            </div>
+            <label class="px-4 py-2 border border-light-green rounded-full text-light-green cursor-pointer hover:bg-light-green/5">
+                更换头像 <input type="file" accept="image/*" class="hidden" id="avatarFile">
+            </label>
+        </div>
+        <div class="mb-5">
+            <label class="block text-sm text-gray-600 mb-2">昵称</label>
+            <input id="inputNick" value="" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-light-green">
+        </div>
+        <div class="mb-5">
+            <label class="block text-sm text-gray-600 mb-2">绿洲ID（不可修改）</label>
+            <input value="OASIS202501" disabled class="w-full border bg-gray-100 border-gray-300 rounded-lg px-4 py-3 text-gray-500">
+        </div>
+        <div class="mb-7">
+            <label class="block text-sm text-gray-600 mb-2">个人简介</label>
+            <textarea id="inputDesc" rows="3" placeholder="介绍一下自己吧~" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-light-green resize-none"></textarea>
+        </div>
+        <div class="flex justify-end gap-4">
+            <button id="btnCancel" class="px-6 py-2.5 border border-gray-300 rounded-full">取消</button>
+            <button id="btnSave" class="px-6 py-2.5 bg-light-green text-white rounded-full hover:opacity-95">保存修改</button>
+        </div>
+    </div>
+</div>
+
+<!-- 帖子详情弹窗 -->
+<div id="postDetailMask" class="fixed inset-0 bg-black/50 z-[1000] hidden flex items-center justify-center p-6">
+    <div class="organic-sm bg-white w-full max-w-[1080px] max-h-[88vh] flex overflow-hidden shadow-xl">
+        <div class="w-[55%] bg-gray-100 shrink-0 relative">
+            <img id="detailImg" src="" class="w-full h-full object-cover">
+            <button id="prevImageBtn" class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white hover:bg-black/70 flex items-center justify-center text-xl hidden">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button id="nextImageBtn" class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white hover:bg-black/70 flex items-center justify-center text-xl hidden">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <div id="imageCounter" class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/60 text-white text-xs px-3 py-1 rounded-full hidden">1/3</div>
+        </div>
+        <div class="w-[45%] flex flex-col p-6 overflow-y-auto">
+            <div class="flex justify-between items-center mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full overflow-hidden">
+                        <img id="detailAvatar" src="" class="w-full h-full object-cover">
+                    </div>
+                    <span id="detailName" class="font-medium text-deep-green">用户名</span>
+                </div>
+                <button id="closePostDetail" class="w-8 h-8 rounded-full border border-gray-300 hover:bg-gray-100">×</button>
+            </div>
+            <h3 id="detailTitle" class="text-xl font-bold text-deep-green mb-3"></h3>
+            <p id="detailDesc" class="text-gray-700 leading-relaxed mb-5"></p>
+            <div id="detailTagWrap" class="flex flex-wrap gap-2 mb-6"></div>
+            <div class="border-t border-gray-200 my-4"></div>
+            <div class="flex gap-6 mb-5">
+                <div id="detailLikeBtn" class="flex items-center gap-1.5 cursor-pointer text-gray-600 hover:text-y2k-pink">
+                <i class="fas fa-heart"></i>
+                <span id="detailLike">0</span>
+            </div>
+                <div id="detailCollectBtn" class="flex items-center gap-1.5 cursor-pointer text-gray-600 hover:text-light-green">
+                <i class="fas fa-bookmark"></i>
+                <span id="detailCollect">0</span>
+            </div>
+                <div class="flex items-center gap-1.5 cursor-pointer text-gray-600 hover:text-deep-green">
+                    <i class="fas fa-comment"></i>
+                    <span id="detailComment">0</span>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 pt-4 flex-1">
+                <h4 class="font-medium text-deep-green mb-3">全部评论</h4>
+                <div id="commentWrap" class="flex flex-col gap-4"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 打卡详情弹窗 -->
+<div id="recordDetailMask" class="fixed inset-0 bg-black/50 z-[1001] hidden flex items-center justify-center p-6">
+    <div class="organic-sm bg-white w-full max-w-[980px] p-8 shadow-lg">
+        <h3 class="text-2xl text-deep-green font-medium mb-8"><i class="fa-solid fa-pen-to-square mr-2"></i>打卡详情</h3>
+        <div class="flex gap-8">
+            <div class="w-1/2 border border-light-green rounded-2xl overflow-hidden">
+                <img id="recordImg" src="" class="w-full h-[360px] object-cover">
+            </div>
+            <div class="w-1/2 flex flex-col">
+                <h4 class="text-xl text-deep-green mb-4">心情日志</h4>
+                <div class="border border-gray-200 rounded-2xl h-[360px] p-5 bg-gray-50 overflow-y-auto">
+                    <p id="recordDesc" class="text-gray-700"></p>
+                </div>
+            </div>
+        </div>
+        <div class="flex justify-between items-center mt-8">
+            <div class="flex items-center gap-3">
+                <span class="text-gray-600">公开范围：</span>
+                <span id="recordScope" class="px-4 py-1.5 rounded-full text-white bg-light-green"></span>
+            </div>
+            <button id="closeRecordDetail" class="px-7 py-2.5 border border-light-green rounded-full text-light-green hover:bg-light-green/5">关闭</button>
+        </div>
+    </div>
+</div>
+
+<!-- 登录/注册弹窗 -->
+<div id="loginMask" class="fixed inset-0 bg-black/50 z-[1002] hidden flex items-center justify-center p-6">
+    <div class="organic-sm bg-white w-full max-w-[450px] p-8 shadow-xl">
+        <div class="flex justify-between items-center mb-6">
+            <h3 id="loginTitle" class="text-2xl font-bold text-deep-green">登录</h3>
+            <button id="closeLoginMask" class="w-8 h-8 rounded-full border border-gray-300 hover:bg-gray-100">×</button>
+        </div>
+        
+        <div id="loginForm">
+            <div class="mb-4">
+                <label class="block text-sm text-gray-600 mb-2">邮箱</label>
+                <input id="loginEmail" type="email" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-light-green" placeholder="your@email.com">
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm text-gray-600 mb-2">密码</label>
+                <input id="loginPassword" type="password" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-light-green" placeholder="密码">
+            </div>
+            <button id="doLoginBtn" class="w-full bg-light-green text-white py-3 rounded-full hover:opacity-90 transition mb-3">登录</button>
+            <p class="text-center text-gray-500 text-sm">没有账号？ <a id="switchToRegister" href="#" class="text-light-green">立即注册</a></p>
+        </div>
+        
+        <div id="registerForm" class="hidden">
+            <div class="mb-4">
+                <label class="block text-sm text-gray-600 mb-2">昵称</label>
+                <input id="regName" type="text" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-light-green" placeholder="怎么称呼你">
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm text-gray-600 mb-2">邮箱</label>
+                <input id="regEmail" type="email" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-light-green" placeholder="your@email.com">
+            </div>
+            <div class="mb-6">
+                <label class="block text-sm text-gray-600 mb-2">密码</label>
+                <input id="regPassword" type="password" class="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:border-light-green" placeholder="至少6位">
+            </div>
+            <button id="doRegisterBtn" class="w-full bg-light-green text-white py-3 rounded-full hover:opacity-90 transition mb-3">注册</button>
+            <p class="text-center text-gray-500 text-sm">已有账号？ <a id="switchToLogin" href="#" class="text-light-green">去登录</a></p>
+        </div>
+        
+        <div id="loginMessage" class="mt-4 text-center text-sm text-red-500 hidden"></div>
+    </div>
+</div>
+
+<!-- 删除评论确认弹窗 -->
+<div id="deleteConfirmMask" class="fixed inset-0 bg-black/40 z-[1005] hidden flex items-center justify-center p-6">
+    <div class="organic-sm bg-white w-full max-w-[400px] p-6 shadow-xl">
+        <div class="text-center">
+            <div class="text-4xl mb-4">🗑️</div>
+            <h3 class="text-lg font-bold text-deep-green mb-2">确认删除</h3>
+            <p class="text-gray-500 text-sm mb-6">确定要删除这条评论吗？<br>删除后无法恢复。</p>
+            <div class="flex gap-4 justify-center">
+                <button id="cancelDeleteBtn" class="px-6 py-2 border border-gray-300 rounded-full hover:bg-gray-50 transition">取消</button>
+                <button id="confirmDeleteBtn" class="px-6 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition">确认删除</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 删除打卡确认弹窗 -->
+<div id="deleteCheckinMask" class="fixed inset-0 bg-black/40 z-[1006] hidden flex items-center justify-center p-6">
+    <div class="organic-sm bg-white w-full max-w-[400px] p-6 shadow-xl">
+        <div class="text-center">
+            <div class="text-4xl mb-4">🗑️</div>
+            <h3 class="text-lg font-bold text-deep-green mb-2">确认删除</h3>
+            <p class="text-gray-500 text-sm mb-6">确定要删除这条打卡记录吗？<br>删除后无法恢复。</p>
+            <div class="flex gap-4 justify-center">
+                <button id="cancelDeleteCheckinBtn" class="px-6 py-2 border border-gray-300 rounded-full hover:bg-gray-50 transition">取消</button>
+                <button id="confirmDeleteCheckinBtn" class="px-6 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition">确认删除</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 删除帖子确认弹窗 -->
+<div id="deletePostMask" class="fixed inset-0 bg-black/40 z-[1007] hidden flex items-center justify-center p-6">
+    <div class="organic-sm bg-white w-full max-w-[400px] p-6 shadow-xl">
+        <div class="text-center">
+            <div class="text-4xl mb-4">🗑️</div>
+            <h3 class="text-lg font-bold text-deep-green mb-2">确认删除</h3>
+            <p class="text-gray-500 text-sm mb-6">确定要删除这篇帖子吗？<br>删除后无法恢复。</p>
+            <div class="flex gap-4 justify-center">
+                <button id="cancelDeletePostBtn" class="px-6 py-2 border border-gray-300 rounded-full hover:bg-gray-50 transition">取消</button>
+                <button id="confirmDeletePostBtn" class="px-6 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition">确认删除</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+// ==================== Supabase 配置 ====================
+const SUPABASE_URL = 'https://gjgacyoqpztsozoljsrd.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_LcsFsepI69M19xAvYzMpcA_YCAmjvBl';
+
+
+// ==================== DOM 元素 ====================
+const notLoggedInDiv = document.getElementById('notLoggedIn');
+const loggedInDiv = document.getElementById('loggedIn');
+const showLoginBtn = document.getElementById('showLoginBtn');
+const loginMask = document.getElementById('loginMask');
+const closeLoginMask = document.getElementById('closeLoginMask');
+const loginFormDiv = document.getElementById('loginForm');
+const registerFormDiv = document.getElementById('registerForm');
+const switchToRegisterLink = document.getElementById('switchToRegister');
+const switchToLoginLink = document.getElementById('switchToLogin');
+const doLoginBtn = document.getElementById('doLoginBtn');
+const doRegisterBtn = document.getElementById('doRegisterBtn');
+const loginMessage = document.getElementById('loginMessage');
+const logoutBtn = document.getElementById('logoutBtn');
+const profileName = document.getElementById('profileName');
+const profileEmail = document.getElementById('profileEmail');
+const inputNickField = document.getElementById('inputNick');
+
+// 存储 session 信息
+let currentSession = null;
+let currentUser = null;
+// 当前打开的帖子ID（用于收藏功能）
+let currentOpenPostId = null;
+
+// 检查本地存储的 session
+function loadSessionFromStorage() {
+    const sessionStr = localStorage.getItem('oasis_session');
+    if (sessionStr) {
+        try {
+            const session = JSON.parse(sessionStr);
+            const expiresAt = new Date(session.expires_at);
+            if (expiresAt > new Date()) {
+                currentSession = session;
+                currentUser = session.user;
+                return true;
+            } else {
+                localStorage.removeItem('oasis_session');
+            }
+        } catch(e) {}
+    }
+    return false;
+}
+
+// 保存 session 到本地存储
+function saveSessionToStorage(session) {
+    if (session && session.access_token) {
+        const expiresAt = new Date();
+        expiresAt.setHours(expiresAt.getHours() + 1);
+        session.expires_at = expiresAt.toISOString();
+        localStorage.setItem('oasis_session', JSON.stringify(session));
+        currentSession = session;
+        currentUser = session.user;
+    }
+}
+
+// 清除 session
+function clearSession() {
+    localStorage.removeItem('oasis_session');
+    currentSession = null;
+    currentUser = null;
+}
+
+// 显示消息
+function showMessage(msg, isError = true) {
+    if (!loginMessage) return;
+    loginMessage.innerText = msg;
+    loginMessage.classList.remove('hidden');
+    if (!isError) {
+        loginMessage.classList.add('text-green-500');
+        loginMessage.classList.remove('text-red-500');
+    } else {
+        loginMessage.classList.add('text-red-500');
+        loginMessage.classList.remove('text-green-500');
+    }
+    setTimeout(() => loginMessage.classList.add('hidden'), 3000);
+}
+
+// ==================== 认证函数 ====================
+
+// 登录 API
+async function login(email, password) {
+    try {
+        const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email,
+                password: password
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            showMessage(data.message || data.error_description || '登录失败');
+            return false;
+        }
+        
+        saveSessionToStorage({
+            access_token: data.access_token,
+            refresh_token: data.refresh_token,
+            user: data.user
+        });
+        
+        showMessage('登录成功！', false);
+        loginMask.classList.add('hidden');
+        updateUIForLoggedIn();
+        return true;
+    } catch (error) {
+        console.error('登录错误:', error);
+        showMessage('网络错误，请稍后重试');
+        return false;
+    }
+}
+
+// 注册 API
+async function register(email, password, fullName) {
+    try {
+        const response = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email,
+                password: password,
+                data: {
+                    full_name: fullName
+                }
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+            showMessage(data.message || data.error_description || '注册失败');
+            return false;
+        }
+        
+        showMessage('注册成功！请登录', false);
+        loginFormDiv.classList.remove('hidden');
+        registerFormDiv.classList.add('hidden');
+        document.getElementById('loginTitle').innerText = '登录';
+        return true;
+    } catch (error) {
+        console.error('注册错误:', error);
+        showMessage('网络错误，请稍后重试');
+        return false;
+    }
+}
+
+// 退出登录
+async function logout() {
+    if (currentSession && currentSession.access_token) {
+        try {
+            await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${currentSession.access_token}`
+                }
+            });
+        } catch(e) {}
+    }
+    clearSession();
+    updateUIForLoggedOut();
+}
+
+// ==================== 加载用户资料 ====================
+async function loadUserProfile() {
+    if (!currentUser || !currentSession) return;
+    
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${currentUser.id}&select=*`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${currentSession.access_token}`
+            }
+        });
+        
+        if (!response.ok) {
+            console.error('加载资料失败:', response.status);
+            return;
+        }
+        
+        const profiles = await response.json();
+        if (profiles && profiles.length > 0) {
+            const profile = profiles[0];
+            const userName = profile.full_name || currentUser.email.split('@')[0];
+            
+            if (profileName) profileName.innerText = userName;
+            if (profileEmail) profileEmail.innerText = currentUser.email;
+            
+            const bioEl = document.getElementById('profileBio');
+            if (bioEl) bioEl.innerText = profile.bio || '这个人很懒，还没写简介~';
+            
+            if (inputNickField) inputNickField.value = userName;
+            if (document.getElementById('inputDesc')) {
+                document.getElementById('inputDesc').value = profile.bio || '这个人很懒，还没写简介~';
+            }
+            
+            // ========== 加载隐私设置 ==========
+            const visibility = profile.post_visibility || 'public';
+            const radio = document.querySelector(`input[name="scope"][value="${visibility}"]`);
+            if (radio) radio.checked = true;
+            
+            // 头像加载
+            if (profile.avatar_url) {
+                document.getElementById('profileAvatar').src = profile.avatar_url;
+                document.getElementById('topAvatar').src = profile.avatar_url;
+                document.getElementById('previewAvatar').src = profile.avatar_url;
+                updateAllAvatars(profile.avatar_url);
+            } else {
+                const defaultAvatar = 'https://picsum.photos/id/64/200/200';
+                document.getElementById('profileAvatar').src = defaultAvatar;
+                document.getElementById('topAvatar').src = 'https://picsum.photos/id/64/100/100';
+                document.getElementById('previewAvatar').src = defaultAvatar;
+            }
+            
+            // ========== 加载关注数、粉丝数、获赞收藏数 ==========
+            await loadUserStats();
+        }
+    } catch (error) {
+        console.error('加载用户资料错误:', error);
+    }
+}
+
+// ==================== 加载用户统计数据 ====================
+async function loadUserStats() {
+    if (!currentUser) return;
+    
+    try {
+        // 1. 获取关注数（我关注的人）
+        const followRes = await fetch(`${SUPABASE_URL}/rest/v1/follows?follower_id=eq.${currentUser.id}&select=id`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${currentSession.access_token}`
+            }
+        });
+        const followData = await followRes.json();
+        const followCount = followData ? followData.length : 0;
+        document.getElementById('followCount').innerText = followCount;
+        
+        // 2. 获取粉丝数（关注我的人）
+        const fansRes = await fetch(`${SUPABASE_URL}/rest/v1/follows?following_id=eq.${currentUser.id}&select=id`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${currentSession.access_token}`
+            }
+        });
+        const fansData = await fansRes.json();
+        const fansCount = fansData ? fansData.length : 0;
+        document.getElementById('fansCount').innerText = fansCount;
+        
+        // 3. 获取获赞与收藏总数
+        // 3.1 获取我的所有帖子ID
+        const postsRes = await fetch(`${SUPABASE_URL}/rest/v1/posts?user_id=eq.${currentUser.id}&select=id`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${currentSession.access_token}`
+            }
+        });
+        const posts = await postsRes.json();
+        const postIds = posts.map(p => p.id);
+        
+        let totalLikes = 0;
+        let totalCollects = 0;
+        
+        if (postIds.length > 0) {
+            // 3.2 获取所有帖子的点赞数
+            const likesRes = await fetch(`${SUPABASE_URL}/rest/v1/likes?post_id=in.(${postIds.join(',')})&select=id`, {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${currentSession.access_token}`
+                }
+            });
+            const likesData = await likesRes.json();
+            totalLikes = likesData ? likesData.length : 0;
+            
+            // 3.3 获取所有帖子的收藏数
+            const collectsRes = await fetch(`${SUPABASE_URL}/rest/v1/favorites?post_id=in.(${postIds.join(',')})&select=id`, {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${currentSession.access_token}`
+                }
+            });
+            const collectsData = await collectsRes.json();
+            totalCollects = collectsData ? collectsData.length : 0;
+        }
+        
+        document.getElementById('likeCount').innerText = totalLikes + totalCollects;
+        
+    } catch (error) {
+        console.error('加载统计数据错误:', error);
+    }
+}
+// ==================== 更新所有头像 ====================
+function updateAllAvatars(avatarUrl) {
+    document.querySelectorAll('.profile-avatar, .top-avatar, .preview-avatar').forEach(el => {
+        el.src = avatarUrl;
+    });
+}
+// ==================== UI 更新函数 ====================
+
+function updateUIForLoggedIn() {
+    if (notLoggedInDiv) notLoggedInDiv.classList.add('hidden');
+    if (loggedInDiv) loggedInDiv.classList.remove('hidden');
+    
+    if (currentUser) {
+        if (profileEmail) profileEmail.innerText = currentUser.email;
+        const tempName = currentUser.email.split('@')[0];
+        if (profileName) profileName.innerText = tempName;
+    }
+    
+    loadUserProfile();
+    renderMyPost();
+    renderCollectPark();
+    renderCollectPost();
+    renderMyRecord();
+    initTabs();
+}
+
+function updateUIForLoggedOut() {
+    if (notLoggedInDiv) notLoggedInDiv.classList.remove('hidden');
+    if (loggedInDiv) loggedInDiv.classList.add('hidden');
+}
+
+function checkSession() {
+    if (loadSessionFromStorage()) {
+        updateUIForLoggedIn();
+    } else {
+        updateUIForLoggedOut();
+    }
+}
+
+// ==================== 渲染我的帖子 ====================
+async function renderMyPost() {
+    const wrap = document.getElementById('myPostWrap');
+    if (!wrap) return;
+    
+    if (!currentUser) {
+        wrap.innerHTML = '<div class="text-center text-gray-400 py-10">请先登录</div>';
+        return;
+    }
+    
+    wrap.innerHTML = `
+        <div class="col-span-full text-center py-10 text-gray-400">
+            <i class="fas fa-spinner fa-spin"></i> 加载中...
+        </div>
+    `;
+    
+    try {
+        // ✅ 改为直接查询 posts 表，包含 likes 字段
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/posts?user_id=eq.${currentUser.id}&order=created_at.desc&limit=20`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${currentSession.access_token}`
+            }
+        });
+        
+        if (!response.ok) {
+            console.error('加载帖子失败:', response.status);
+            wrap.innerHTML = '<div class="text-center text-gray-400 py-10">加载失败，请刷新重试</div>';
+            return;
+        }
+        
+        const posts = await response.json();
+        console.log('我的帖子:', posts);
+        
+        if (!posts || posts.length === 0) {
+            wrap.innerHTML = `
+                <div class="col-span-full text-center py-10 text-gray-400">
+                    <div class="text-4xl mb-3">📝</div>
+                    <p>还没有发布过帖子</p>
+                    <p class="text-sm text-gray-300 mt-1">去社区分享你的公园体验吧！</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // ✅ 手动获取用户信息（为了显示用户名）
+        const userIds = [...new Set(posts.map(p => p.user_id).filter(id => id))];
+        let userMap = {};
+        if (userIds.length > 0) {
+            const idsParam = userIds.map(id => `id=eq.${id}`).join('&');
+            const profileRes = await fetch(`${SUPABASE_URL}/rest/v1/profiles?select=id,full_name&${idsParam}`, {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                }
+            });
+            if (profileRes.ok) {
+                const profiles = await profileRes.json();
+                profiles.forEach(p => {
+                    userMap[p.id] = p;
+                });
+            }
+        }
+        
+        wrap.innerHTML = '';
+        posts.forEach(post => {
+            const user = userMap[post.user_id] || {};
+            const userName = user.full_name || post.user_id?.substring(0, 8) || '用户';
+            const images = post.images || [];
+            const coverImage = images.length > 0 ? images[0] : 'https://picsum.photos/seed/' + post.id + '/400/300';
+            const timeAgo = getTimeAgo(post.created_at);
+            const titleText = post.title || post.park_name || post.park_id || '公园打卡';
+            
+            const div = document.createElement('div');
+            div.className = "organic-sm bg-white shadow overflow-hidden record-card cursor-pointer hover:shadow-lg transition relative group";
+            div.setAttribute('data-post-id', post.id); 
+            div.innerHTML = `
+                <div class="h-[180px] bg-gray-100 relative">
+                    <img src="${coverImage}" class="w-full h-full object-cover" onerror="this.src='https://picsum.photos/seed/${post.id}/400/300'">
+                    ${images.length > 1 ? `
+                        <span class="absolute bottom-2 right-2 bg-black/50 text-white text-xs px-2 py-0.5 rounded-full">
+                            📷 ${images.length}
+                        </span>
+                    ` : ''}
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-gray-400">${timeAgo}</span>
+                        <span class="text-xs text-light-green">❤️ ${post.likes || 0}</span>
+                    </div>
+                    <p class="text-sm text-gray-700 mt-1 line-clamp-2">${post.content || ''}</p>
+                    <div class="flex justify-between items-center mt-2">
+                        <div class="text-xs text-gray-400 mt-2">${titleText}</div>
+                        <button class="delete-post-btn text-gray-400 hover:text-red-500 transition text-sm opacity-0 group-hover:opacity-100" data-post-id="${post.id}" title="删除帖子">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // 点击卡片打开详情
+            div.onclick = (e) => {
+                if (e.target.closest('.delete-post-btn')) return;
+                openPostDetail({
+                    id: post.id,
+                    img: coverImage,
+                    images: images,
+                    area: titleText,
+                    desc: post.content || '',
+                    content: post.content || '',
+                    like: post.likes || 0,
+                    likes: post.likes || 0,
+                    collect_count: post.collect_count || 0,
+                    comment_count: post.comment_count || 0,
+                    full_name: userName,
+                    user_id: post.user_id,
+                    author: `@${userName}`
+                });
+            };
+            
+            // 绑定删除按钮事件
+            div.querySelector('.delete-post-btn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                const postId = this.dataset.postId;
+                deleteMyPost(postId);
+            });
+            
+            wrap.appendChild(div);
+        });
+        
+    } catch (error) {
+        console.error('加载帖子错误:', error);
+        wrap.innerHTML = '<div class="text-center text-gray-400 py-10">加载失败，请刷新重试</div>';
+    }
+}
+// ==================== 删除我的帖子 ====================
+let pendingDeletePostId = null;
+
+async function deleteMyPost(postId) {
+    if (!currentUser || !currentSession) {
+        alert('请先登录');
+        return;
+    }
+    
+    // 显示自定义确认弹窗（复用删除打卡的弹窗，或创建新的）
+    pendingDeletePostId = postId;
+    document.getElementById('deletePostMask').classList.remove('hidden');
+}
+
+// 确认删除帖子
+document.getElementById('confirmDeletePostBtn')?.addEventListener('click', async function() {
+    const postId = pendingDeletePostId;
+    if (!postId) return;
+    
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/posts?id=eq.${postId}`, {
+            method: 'DELETE',
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${currentSession.access_token}`,
+                'Prefer': 'return=minimal'
+            }
+        });
+        
+        if (response.ok) {
+            document.getElementById('deletePostMask').classList.add('hidden');
+            pendingDeletePostId = null;
+            renderMyPost();
+            renderCollectPost();
+            // ========== 刷新统计数据 ==========
+            loadUserStats();
+            alert('✅ 帖子已删除');
+        } else {
+            const error = await response.text();
+            console.error('删除失败:', error);
+            alert('❌ 删除失败，请重试');
+        }
+    } catch (error) {
+        console.error('删除错误:', error);
+        alert('❌ 网络错误，请重试');
+    }
+});
+// 取消删除帖子
+document.getElementById('cancelDeletePostBtn')?.addEventListener('click', function() {
+    document.getElementById('deletePostMask').classList.add('hidden');
+    pendingDeletePostId = null;
+});
+
+// 点击遮罩关闭
+document.getElementById('deletePostMask')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        this.classList.add('hidden');
+        pendingDeletePostId = null;
+    }
+});
+async function renderCollectPark() {
+    const wrap = document.getElementById('collectParkWrap');
+    if (!wrap) return;
+    
+    if (!currentUser) {
+        wrap.innerHTML = '<div class="text-center text-gray-400 py-10">请先登录</div>';
+        return;
+    }
+    
+    wrap.innerHTML = `
+        <div class="text-center text-gray-400 py-10 w-full">
+            <i class="fas fa-spinner fa-spin"></i> 加载中...
+        </div>
+    `;
+    
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/favorites?user_id=eq.${currentUser.id}&select=park_id`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${currentSession.access_token}`
+            }
+        });
+        
+        if (!response.ok) {
+            console.error('加载收藏公园失败:', response.status);
+            wrap.innerHTML = '<div class="text-center text-gray-400 py-10">加载失败</div>';
+            return;
+        }
+        
+        const favorites = await response.json();
+        console.log('收藏公园列表:', favorites);
+        
+        if (!favorites || favorites.length === 0) {
+            wrap.innerHTML = `
+                <div class="text-center text-gray-400 py-10 w-full">
+                    <p>🏗️ 还没有收藏的公园</p>
+                    <p class="text-sm text-gray-300 mt-1">去探索页找到喜欢的公园收藏起来吧！</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const parkIds = favorites.map(f => f.park_id).filter(id => id && id !== 'null');
+        if (parkIds.length === 0) {
+            wrap.innerHTML = '<div class="text-center text-gray-400 py-10">暂无收藏</div>';
+            return;
+        }
+        
+        // ========== 修改这里：使用 or 条件 ==========
+        const idsParam = `or=(${parkIds.map(id => `id.eq.${id}`).join(',')})`;
+        const parksResponse = await fetch(`${SUPABASE_URL}/rest/v1/parks?${idsParam}&limit=20`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${currentSession.access_token}`
+            }
+        });
+        
+        const parks = await parksResponse.json();
+        console.log('收藏的公园详情:', parks);
+        
+        if (!parks || parks.length === 0) {
+            wrap.innerHTML = '<div class="text-center text-gray-400 py-10">暂无收藏</div>';
+            return;
+        }
+        
+        wrap.innerHTML = '';
+        parks.forEach(item => {
+            let photos = [];
+            try { photos = JSON.parse(item.photos || '[]'); } catch(e) {}
+            const coverImage = photos.length > 0 ? photos[0] : 'https://picsum.photos/seed/' + item.id + '/400/300';
+            
+            const div = document.createElement('div');
+            div.className = "organic-sm bg-white shadow p-4 min-w-[220px] cursor-pointer hover:shadow-lg transition";
+            div.innerHTML = `
+                <div class="h-36 rounded-lg overflow-hidden">
+                    <img src="${coverImage}" class="w-full h-full object-cover" onerror="this.src='https://picsum.photos/seed/${item.id}/400/300'">
+                </div>
+                <h4 class="font-bold text-deep-green mt-2">${item.name || '未命名公园'}</h4>
+                <p class="text-xs text-gray-500">${item.district || ''}${item.district ? ' · ' : ''}${item.rating || '暂无评分'}</p>
+            `;
+            div.onclick = () => {
+                window.location.href = `公园详情.html?id=${item.id}`;
+            };
+            wrap.appendChild(div);
+        });
+        
+    } catch (error) {
+        console.error('加载收藏公园错误:', error);
+        wrap.innerHTML = '<div class="text-center text-gray-400 py-10">加载失败，请刷新重试</div>';
+    }
+}
+// ==================== 渲染收藏帖子 ====================
+async function renderCollectPost() {
+    const wrap = document.getElementById('collectPostWrap');
+    if (!wrap) return;
+    
+    if (!currentUser) {
+        wrap.innerHTML = '<div class="text-center text-gray-400 py-10">请先登录</div>';
+        return;
+    }
+    
+    wrap.innerHTML = `
+        <div class="col-span-full text-center py-10 text-gray-400">
+            <i class="fas fa-spinner fa-spin"></i> 加载中...
+        </div>
+    `;
+    
+    try {
+        // 1. 获取收藏的帖子ID列表
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/favorites?user_id=eq.${currentUser.id}&select=post_id`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${currentSession.access_token}`
+            }
+        });
+        
+        if (!response.ok) {
+            console.error('加载收藏帖子失败:', response.status);
+            wrap.innerHTML = '<div class="text-center text-gray-400 py-10">加载失败，请刷新重试</div>';
+            return;
+        }
+        
+        const favorites = await response.json();
+        console.log('收藏帖子列表:', favorites);
+        
+        if (!favorites || favorites.length === 0) {
+            wrap.innerHTML = `
+                <div class="col-span-full text-center py-10 text-gray-400">
+                    <div class="text-4xl mb-3">⭐</div>
+                    <p>还没有收藏的帖子</p>
+                    <p class="text-sm text-gray-300 mt-1">在社区看到喜欢的帖子就收藏起来吧！</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const postIds = favorites.map(f => f.post_id).filter(id => id);
+        if (postIds.length === 0) {
+            wrap.innerHTML = '<div class="text-center text-gray-400 py-10">暂无收藏</div>';
+            return;
+        }
+        
+        // ✅ 查询帖子详情
+        const idsParam = `or=(${postIds.map(id => `id.eq.${id}`).join(',')})`;
+        const postsResponse = await fetch(`${SUPABASE_URL}/rest/v1/posts?${idsParam}&order=created_at.desc&select=id,user_id,park_id,title,content,images,likes,comment_count,collect_count,created_at,visibility`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`
+            }
+        });
+                
+        const posts = await postsResponse.json();
+        console.log('收藏的帖子详情:', posts);
+        
+        if (!posts || posts.length === 0) {
+            wrap.innerHTML = '<div class="text-center text-gray-400 py-10">暂无收藏</div>';
+            return;
+        }
+        
+        // ========== ✅ 关键修复：获取所有用户资料 ==========
+        const userIds = [...new Set(posts.map(p => p.user_id).filter(id => id))];
+        let userMap = {};
+
+        if (userIds.length > 0) {
+            // 使用 or 条件批量查询
+            const idsParam2 = `or=(${userIds.map(id => `id.eq.${id}`).join(',')})`;
+            const profileRes = await fetch(`${SUPABASE_URL}/rest/v1/profiles?${idsParam2}&select=id,full_name,avatar_url`, {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                }
+            });
+            if (profileRes.ok) {
+                const profiles = await profileRes.json();
+                console.log('✅ 获取到的用户资料:', profiles);
+                profiles.forEach(p => {
+                    userMap[p.id] = p;
+                });
+            } else {
+                console.error('❌ 获取用户资料失败:', profileRes.status);
+            }
+            
+            // 对于没有获取到的用户，使用默认值
+            userIds.forEach(uid => {
+                if (!userMap[uid]) {
+                    console.warn(`⚠️ 用户 ${uid} 没有资料，使用默认值`);
+                    userMap[uid] = {
+                        full_name: uid.substring(0, 8),
+                        avatar_url: 'https://picsum.photos/id/64/100/100'
+                    };
+                }
+            });
+        }
+        
+        // ========== ✅ 调试：打印 userMap ==========
+        console.log('📋 userMap:', userMap);
+        
+        wrap.innerHTML = '';
+        posts.forEach(post => {
+            // ========== ✅ 关键修复：从 userMap 获取用户名 ==========
+            const userId = post.user_id;
+            const user = userMap[userId];
+            
+            // ✅ 调试：打印每个帖子对应的用户信息
+            console.log(`🔍 帖子 ${post.id}: userId="${userId}", user对象=`, user);
+            
+            let userName;
+            if (user && user.full_name) {
+                userName = user.full_name;
+            } else if (userId) {
+                // 降级方案：使用 user_id 的前8位
+                userName = userId.substring(0, 8);
+                console.warn(`⚠️ 帖子 ${post.id} 的作者 ${userId} 没有找到用户名，使用: ${userName}`);
+            } else {
+                userName = '用户';
+            }
+            
+            console.log(`📝 帖子 ${post.id}: 作者ID=${userId}, 用户名=${userName}`);
+            
+            const images = post.images || [];
+            const coverImage = images.length > 0 ? images[0] : 'https://picsum.photos/seed/' + post.id + '/400/300';
+            const timeAgo = getTimeAgo(post.created_at);
+            const titleText = post.title || '公园打卡';
+            
+            const div = document.createElement('div');
+            div.className = "organic-sm bg-white shadow overflow-hidden record-card cursor-pointer hover:shadow-lg transition";
+            div.innerHTML = `
+                <div class="h-[180px] bg-gray-100 relative">
+                    <img src="${coverImage}" class="w-full h-full object-cover" onerror="this.src='https://picsum.photos/seed/${post.id}/400/300'">
+                    ${images.length > 1 ? `
+                        <span class="absolute bottom-2 right-2 bg-black/50 text-white text-xs px-2 py-0.5 rounded-full">
+                            📷 ${images.length}
+                        </span>
+                    ` : ''}
+                </div>
+                <div class="p-4">
+                    <div class="flex justify-end">
+                        <span class="text-xs text-gray-400">${timeAgo}</span>
+                    </div>
+                    <p class="text-sm text-gray-700 mt-1 line-clamp-2">${post.content || ''}</p>
+                    <div class="text-xs text-gray-400 mt-2">${titleText} · @${userName}</div>
+                </div>
+            `;
+            div.onclick = () => {
+                openPostDetail({
+                    id: post.id,
+                    img: coverImage,
+                    images: images,
+                    area: titleText,
+                    desc: post.content || '',
+                    content: post.content || '',
+                    like: post.likes || 0,
+                    likes: post.likes || 0,
+                    collect_count: post.collect_count || 0,
+                    comment_count: post.comment_count || 0,
+                    full_name: userName,
+                    user_id: post.user_id,
+                    author: `@${userName}`,
+                    avatar_url: user?.avatar_url || 'https://picsum.photos/id/64/100/100'
+                });
+            };
+            wrap.appendChild(div);
+        });
+        
+    } catch (error) {
+        console.error('加载收藏帖子错误:', error);
+        wrap.innerHTML = '<div class="text-center text-gray-400 py-10">加载失败，请刷新重试</div>';
+    }
+}
+async function renderMyRecord() {
+    const wrap = document.getElementById('myRecordWrap');
+    if (!wrap) return;
+    
+    if (!currentUser) {
+        wrap.innerHTML = '<div class="text-center text-gray-400 py-10">请先登录</div>';
+        return;
+    }
+    
+    wrap.innerHTML = `
+        <div class="text-center text-gray-400 py-10 w-full">
+            <i class="fas fa-spinner fa-spin"></i> 加载中...
+        </div>
+    `;
+    
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/checkins?user_id=eq.${currentUser.id}&order=created_at.desc&limit=50`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${currentSession.access_token}`
+            }
+        });
+        
+        if (!response.ok) {
+            console.error('加载打卡记录失败:', response.status);
+            wrap.innerHTML = '<div class="text-center text-gray-400 py-10">加载失败</div>';
+            return;
+        }
+        
+        const checkins = await response.json();
+        console.log('打卡记录:', checkins);
+        
+        if (!checkins || checkins.length === 0) {
+            wrap.innerHTML = `
+                <div class="text-center text-gray-400 py-10 w-full">
+                    <div class="text-4xl mb-3">📍</div>
+                    <p>还没有打卡记录</p>
+                    <p class="text-sm text-gray-300 mt-1">去公园详情页分享你的足迹吧！</p>
+                </div>
+            `;
+            return;
+        }
+        
+        wrap.innerHTML = '';
+        checkins.forEach(item => {
+            const dateStr = new Date(item.created_at).toLocaleDateString('zh-CN', {
+                year: 'numeric', month: 'long', day: 'numeric'
+            });
+            const visibilityIcon = item.visibility === 'public' ? '🌍' : '🔒';
+            const visibilityText = item.visibility === 'public' ? '公开' : '私密';
+            const images = item.images || [];
+            const coverImage = images.length > 0 ? images[0] : 'https://picsum.photos/seed/' + item.id + '/400/300';
+            
+            const div = document.createElement('div');
+            div.className = "bg-white organic-sm shadow overflow-hidden record-card cursor-pointer hover:shadow-lg transition flex flex-col md:flex-row";
+            div.innerHTML = `
+    <div class="md:w-48 h-48 md:h-auto overflow-hidden shrink-0 relative">
+        <img src="${coverImage}" class="w-full h-full object-cover" onerror="this.src='https://picsum.photos/seed/${item.id}/400/300'">
+    </div>
+    <div class="flex-1 p-5 relative">
+        <div class="flex items-center gap-2 mb-2">
+            <span class="text-xs text-gray-400">${dateStr}</span>
+            <span class="text-xs px-2 py-0.5 rounded-full ${item.visibility === 'public' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}">
+                ${visibilityIcon} ${visibilityText}
+            </span>
+        </div>
+        <h4 class="font-bold text-deep-green">${item.park_name || '公园打卡'}</h4>
+        <p class="text-sm text-gray-600 mt-1 line-clamp-2">${item.content || ''}</p>
+        <div class="text-xs text-gray-400 mt-3">${getTimeAgo(item.created_at)}</div>
+        <!-- 删除按钮 -->
+        <button class="delete-checkin-btn absolute top-3 right-3 text-gray-400 hover:text-red-500 transition text-sm" data-checkin-id="${item.id}" title="删除打卡">
+            <i class="fas fa-trash-alt"></i>
+        </button>
+    </div>
+`;
+            
+            div.onclick = () => {
+                openRecordDetail({
+                    id: item.id,
+                    img: coverImage,
+                    name: item.park_name || '公园打卡',
+                    content: item.content || '',
+                    visibility: item.visibility || 'public',
+                    created_at: item.created_at,
+                    images: images
+                });
+            };
+           // 绑定删除按钮事件（放在循环内部，wrap.appendChild(div) 之前或之后都可以）
+            div.querySelector('.delete-checkin-btn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                const checkinId = this.dataset.checkinId;
+                deleteCheckin(checkinId);
+            });
+
+            wrap.appendChild(div);
+            });
+// 注意：右括号 } 后面不要有绑定代码
+    } catch (error) {
+        console.error('加载打卡记录错误:', error);
+        wrap.innerHTML = '<div class="text-center text-gray-400 py-10">加载失败，请刷新重试</div>';
+    }
+}
+
+function initTabs() {
+    const tabItems = document.querySelectorAll('.tab-item');
+    const tabContents = document.querySelectorAll('.tab-content');
+    tabItems.forEach(tab => {
+        tab.onclick = () => {
+            const tabKey = tab.dataset.tab;
+            tabItems.forEach(t => {
+                t.classList.remove('tab-active');
+                t.classList.add('text-gray-500');
+            });
+            tab.classList.add('tab-active');
+            tab.classList.remove('text-gray-500');
+            tabContents.forEach(c => c.classList.add('hidden'));
+            const target = document.getElementById(`tab-${tabKey}`);
+            if (target) target.classList.remove('hidden');
+        };
+    });
+}
+
+// ==================== 打开帖子详情弹窗 ====================
+async function openPostDetail(postItem) {
+    console.log('打开帖子详情:', postItem);
+    
+    const detailImgEl = document.getElementById('detailImg');
+    const detailAvatarEl = document.getElementById('detailAvatar');
+    const detailNameEl = document.getElementById('detailName');
+    const detailTitleEl = document.getElementById('detailTitle');
+    const detailDescEl = document.getElementById('detailDesc');
+    const detailLikeEl = document.getElementById('detailLike');
+    const detailCollectEl = document.getElementById('detailCollect');
+    const detailCommentEl = document.getElementById('detailComment');
+    const tagWrap = document.getElementById('detailTagWrap');
+    const commentWrapDiv = document.getElementById('commentWrap');
+    
+    // 保存帖子ID
+    const postId = postItem.id;
+    currentOpenPostId = postId;
+    
+    // ========== ✅ 从数据库获取帖子数据和用户资料 ==========
+    let postData = postItem;
+    let userProfile = null;
+    
+    try {
+        // 1. 获取帖子数据
+        const postResponse = await fetch(`${SUPABASE_URL}/rest/v1/posts?id=eq.${postId}&select=*`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`
+            }
+        });
+        if (postResponse.ok) {
+            const data = await postResponse.json();
+            if (data && data.length > 0) {
+                postData = { ...postData, ...data[0] };
+                console.log('✅ 获取到帖子数据:', postData);
+            }
+        }
+        
+        // 2. ✅ 关键修复：获取帖子作者的完整资料
+        if (postItem.user_id) {
+            const userResponse = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${postItem.user_id}&select=id,full_name,avatar_url,bio`, {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                }
+            });
+            if (userResponse.ok) {
+                const userData = await userResponse.json();
+                if (userData && userData.length > 0) {
+                    userProfile = userData[0];
+                    console.log('✅ 获取到用户资料:', userProfile);
+                }
+            }
+        }
+        
+        // 如果获取用户资料失败，使用 postItem 中的值
+        if (!userProfile) {
+            userProfile = {
+                full_name: postItem.full_name || postItem.author?.replace('@', '') || '用户',
+                avatar_url: postItem.avatar_url || 'https://picsum.photos/id/64/100/100'
+            };
+        }
+        
+    } catch (error) {
+        console.error('获取数据失败:', error);
+        // 使用传入的数据
+        userProfile = {
+            full_name: postItem.full_name || postItem.author?.replace('@', '') || '用户',
+            avatar_url: postItem.avatar_url || 'https://picsum.photos/id/64/100/100'
+        };
+    }
+    
+    // 获取图片
+    const images = postItem.images || [];
+    const coverImage = postItem.img || (images.length > 0 ? images[0] : 'https://picsum.photos/seed/default/400/400');
+    
+    if (detailImgEl) detailImgEl.src = coverImage;
+    
+    // ========== 图片轮播逻辑 ==========
+    const prevBtn = document.getElementById('prevImageBtn');
+    const nextBtn = document.getElementById('nextImageBtn');
+    const counter = document.getElementById('imageCounter');
+    
+    window._currentDetailImages = images;
+    window._currentDetailIndex = 0;
+    
+    if (counter) {
+        if (images.length > 1) {
+            counter.classList.remove('hidden');
+            counter.innerText = `1/${images.length}`;
+        } else {
+            counter.classList.add('hidden');
+        }
+    }
+    
+    if (prevBtn && nextBtn) {
+        if (images.length > 1) {
+            prevBtn.classList.remove('hidden');
+            nextBtn.classList.remove('hidden');
+        } else {
+            prevBtn.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+        }
+    }
+    
+    if (prevBtn) {
+        prevBtn.onclick = function(e) {
+            e.stopPropagation();
+            if (!window._currentDetailImages || window._currentDetailImages.length === 0) return;
+            window._currentDetailIndex = (window._currentDetailIndex - 1 + window._currentDetailImages.length) % window._currentDetailImages.length;
+            const img = document.getElementById('detailImg');
+            if (img) img.src = window._currentDetailImages[window._currentDetailIndex];
+            const counterEl = document.getElementById('imageCounter');
+            if (counterEl) counterEl.innerText = `${window._currentDetailIndex + 1}/${window._currentDetailImages.length}`;
+        };
+    }
+    
+    if (nextBtn) {
+        nextBtn.onclick = function(e) {
+            e.stopPropagation();
+            if (!window._currentDetailImages || window._currentDetailImages.length === 0) return;
+            window._currentDetailIndex = (window._currentDetailIndex + 1) % window._currentDetailImages.length;
+            const img = document.getElementById('detailImg');
+            if (img) img.src = window._currentDetailImages[window._currentDetailIndex];
+            const counterEl = document.getElementById('imageCounter');
+            if (counterEl) counterEl.innerText = `${window._currentDetailIndex + 1}/${window._currentDetailImages.length}`;
+        };
+    }
+    
+    // 键盘左右键支持
+    document.addEventListener('keydown', function(e) {
+        const mask = document.getElementById('postDetailMask');
+        if (!mask || mask.classList.contains('hidden')) return;
+        if (e.key === 'ArrowLeft') {
+            const btn = document.getElementById('prevImageBtn');
+            if (btn) btn.click();
+        } else if (e.key === 'ArrowRight') {
+            const btn = document.getElementById('nextImageBtn');
+            if (btn) btn.click();
+        }
+    });
+    
+    // ========== ✅ 头像：使用用户资料 ==========
+    if (detailAvatarEl) {
+        detailAvatarEl.src = userProfile.avatar_url || 'https://picsum.photos/id/64/100/100';
+    }
+    
+    // ========== ✅ 名称：使用用户资料 ==========
+    if (detailNameEl) {
+        const authorName = userProfile.full_name || '用户';
+        detailNameEl.innerText = authorName;
+        console.log('✅ 显示用户名:', authorName);
+        detailNameEl.style.cursor = 'pointer';
+        detailNameEl.onclick = () => {
+            if (postItem.user_id) {
+                window.location.href = `用户主页.html?userId=${postItem.user_id}`;
+            }
+        };
+    }
+    
+    // 标题
+    if (detailTitleEl) {
+        detailTitleEl.innerText = postItem.area || '公园打卡';
+    }
+    
+    // 内容
+    if (detailDescEl) {
+        detailDescEl.innerText = postItem.content || postItem.desc || '';
+    }
+    
+    // ========== ✅ 显示数据 ==========
+    if (detailLikeEl) {
+        detailLikeEl.innerText = postData.like || postData.likes || 0;
+    }
+    if (detailCollectEl) {
+        detailCollectEl.innerText = postData.collect_count || 0;
+    }
+    if (detailCommentEl) {
+        detailCommentEl.innerText = postData.comment_count || 0;
+    }
+    
+    // 标签
+    if (tagWrap) {
+        tagWrap.innerHTML = '';
+        ["#深圳公园", "#户外打卡", "#休闲放松"].forEach(tag => {
+            let span = document.createElement('span');
+            span.className = "px-2 py-1 bg-light-green/15 text-light-green rounded-full text-sm";
+            span.innerText = tag;
+            tagWrap.appendChild(span);
+        });
+    }
+    
+    // ==================== ✅ 从数据库实时获取点赞数、收藏数、评论数 ====================
+    try {
+        if (postId) {
+            // ✅ 1. 获取点赞总数
+            const likeCountResponse = await fetch(`${SUPABASE_URL}/rest/v1/likes?post_id=eq.${postId}&select=id`, {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                }
+            });
+            if (likeCountResponse.ok) {
+                const likeCountData = await likeCountResponse.json();
+                const likeCount = likeCountData ? likeCountData.length : 0;
+                if (detailLikeEl) detailLikeEl.innerText = likeCount;
+                console.log(`✅ 实时点赞数: ${likeCount}`);
+            }
+            
+            // ✅ 2. 获取收藏总数
+            const collectCountResponse = await fetch(`${SUPABASE_URL}/rest/v1/favorites?post_id=eq.${postId}&select=id`, {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                }
+            });
+            if (collectCountResponse.ok) {
+                const collectCountData = await collectCountResponse.json();
+                const collectCount = collectCountData ? collectCountData.length : 0;
+                if (detailCollectEl) detailCollectEl.innerText = collectCount;
+                console.log(`✅ 实时收藏数: ${collectCount}`);
+            }
+            
+            // ✅ 3. 获取评论总数
+            const commentCountResponse = await fetch(`${SUPABASE_URL}/rest/v1/comments?post_id=eq.${postId}&select=id`, {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                }
+            });
+            if (commentCountResponse.ok) {
+                const commentCountData = await commentCountResponse.json();
+                const commentCount = commentCountData ? commentCountData.length : 0;
+                if (detailCommentEl) detailCommentEl.innerText = commentCount;
+                console.log(`✅ 实时评论数: ${commentCount}`);
+            }
+        }
+    } catch (error) {
+        console.error('获取实时数据失败:', error);
+    }
+    
+    // ==================== 检查收藏状态 ====================
+    const collectIcon = document.querySelector('#detailCollectBtn i');
+    const detailCollectBtn = document.getElementById('detailCollectBtn');
+    
+    try {
+        if (postId && currentSession) {
+            const checkResponse = await fetch(`${SUPABASE_URL}/rest/v1/favorites?user_id=eq.${currentUser.id}&post_id=eq.${postId}&select=id`, {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${currentSession.access_token}`
+                }
+            });
+            if (checkResponse.ok) {
+                const existing = await checkResponse.json();
+                if (collectIcon) {
+                    if (existing && existing.length > 0) {
+                        collectIcon.classList.add('text-light-green');
+                    } else {
+                        collectIcon.classList.remove('text-light-green');
+                    }
+                }
+            }
+        } else {
+            if (collectIcon) {
+                collectIcon.classList.remove('text-light-green');
+            }
+        }
+    } catch (error) {
+        console.error('获取收藏状态失败:', error);
+    }
+    
+    // ==================== 检查点赞状态 ====================
+    const likeIcon = document.querySelector('#detailLikeBtn i');
+    
+    try {
+        if (postId && currentSession) {
+            const checkLikeResponse = await fetch(`${SUPABASE_URL}/rest/v1/likes?user_id=eq.${currentUser.id}&post_id=eq.${postId}&select=id`, {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${currentSession.access_token}`
+                }
+            });
+            if (checkLikeResponse.ok) {
+                const existingLikes = await checkLikeResponse.json();
+                if (likeIcon) {
+                    if (existingLikes && existingLikes.length > 0) {
+                        likeIcon.classList.add('text-y2k-pink');
+                    } else {
+                        likeIcon.classList.remove('text-y2k-pink');
+                    }
+                }
+            }
+        } else {
+            if (likeIcon) {
+                likeIcon.classList.remove('text-y2k-pink');
+            }
+        }
+    } catch (error) {
+        console.error('获取点赞状态失败:', error);
+    }
+    
+    // ==================== 绑定收藏事件 ====================
+    if (detailCollectBtn) {
+        detailCollectBtn.replaceWith(detailCollectBtn.cloneNode(true));
+        const newCollectBtn = document.getElementById('detailCollectBtn');
+        if (newCollectBtn) {
+            newCollectBtn.onclick = () => {
+                if (currentOpenPostId) {
+                    handleCollectInProfile(currentOpenPostId);
+                }
+            };
+        }
+    }
+    
+    // ==================== 绑定点赞事件 ====================
+    const detailLikeBtn = document.getElementById('detailLikeBtn');
+    if (detailLikeBtn) {
+        detailLikeBtn.onclick = () => {
+            if (currentOpenPostId) {
+                handleLikeInProfile(currentOpenPostId);
+            }
+        };
+    }
+    
+    // ==================== 加载评论 ====================
+    if (commentWrapDiv) {
+        commentWrapDiv.innerHTML = `
+            <div class="text-center text-gray-400 text-sm py-4">
+                <i class="fas fa-spinner fa-spin"></i> 加载评论中...
+            </div>
+        `;
+        loadComments(postId);
+    }
+    
+    const postDetailMaskDiv = document.getElementById('postDetailMask');
+    if (postDetailMaskDiv) postDetailMaskDiv.classList.remove('hidden');
+}
+// ==================== 更新收藏卡片上的点赞数 ====================
+function updateCollectCardLikes(postId, newCount) {
+    // 通过 data-post-id 精确定位
+    const wrap = document.getElementById('collectPostWrap');
+    if (!wrap) return;
+    
+    const card = wrap.querySelector(`.record-card[data-post-id="${postId}"]`);
+    if (card) {
+        const likeSpan = card.querySelector('.text-light-green');
+        if (likeSpan) {
+            likeSpan.textContent = `❤️ ${newCount}`;
+            console.log(`✅ 更新收藏卡片点赞数: ${newCount}`);
+        }
+    } else {
+        console.log(`⚠️ 未找到帖子 ${postId} 的卡片`);
+    }
+}
+// ==================== 个人中心的点赞功能 ====================
+async function handleLikeInProfile(postId) {
+    if (!currentUser || !currentSession) {
+        alert('请先登录');
+        return;
+    }
+    
+    try {
+        // 检查是否已点赞
+        const checkResponse = await fetch(`${SUPABASE_URL}/rest/v1/likes?user_id=eq.${currentUser.id}&post_id=eq.${postId}&select=id`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${currentSession.access_token}`
+            }
+        });
+        
+        if (!checkResponse.ok) {
+            console.error('检查点赞失败:', checkResponse.status);
+            alert('操作失败，请重试');
+            return;
+        }
+        
+        const existing = await checkResponse.json();
+        const isLiked = existing && existing.length > 0;
+        const likeIcon = document.querySelector('#detailLikeBtn i');
+        const likeCount = document.getElementById('detailLike');
+        
+        if (isLiked) {
+            // 取消点赞
+            const deleteResponse = await fetch(`${SUPABASE_URL}/rest/v1/likes?id=eq.${existing[0].id}`, {
+                method: 'DELETE',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${currentSession.access_token}`,
+                    'Prefer': 'return=minimal'
+                }
+            });
+            
+            if (deleteResponse.ok) {
+                // 获取最新点赞数
+                const countRes = await fetch(`${SUPABASE_URL}/rest/v1/likes?post_id=eq.${postId}&select=id`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${currentSession.access_token}`
+                    }
+                });
+                const countData = await countRes.json();
+                const newCount = countData ? countData.length : 0;
+                
+                // 更新 posts 表的 likes 字段
+                await fetch(`${SUPABASE_URL}/rest/v1/posts?id=eq.${postId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${currentSession.access_token}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({ likes: newCount })
+                });
+                
+                // 更新弹窗
+                if (likeIcon) likeIcon.classList.remove('text-y2k-pink');
+                if (likeCount) likeCount.innerText = newCount;
+                
+                // ✅ 直接重新渲染收藏列表（重新从数据库获取数据）
+                await renderCollectPost();
+            }
+        } else {
+            // 添加点赞
+            const insertResponse = await fetch(`${SUPABASE_URL}/rest/v1/likes`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${currentSession.access_token}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({
+                    user_id: currentUser.id,
+                    post_id: postId
+                })
+            });
+            
+            if (insertResponse.ok) {
+                // 获取最新点赞数
+                const countRes = await fetch(`${SUPABASE_URL}/rest/v1/likes?post_id=eq.${postId}&select=id`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${currentSession.access_token}`
+                    }
+                });
+                const countData = await countRes.json();
+                const newCount = countData ? countData.length : 0;
+                
+                // 更新 posts 表的 likes 字段
+                await fetch(`${SUPABASE_URL}/rest/v1/posts?id=eq.${postId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${currentSession.access_token}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({ likes: newCount })
+                });
+                
+                // 更新弹窗
+                if (likeIcon) likeIcon.classList.add('text-y2k-pink');
+                if (likeCount) likeCount.innerText = newCount;
+                
+                // ✅ 直接重新渲染收藏列表（重新从数据库获取数据）
+                await renderCollectPost();
+            }
+        }
+    } catch (error) {
+        console.error('点赞错误:', error);
+        alert('网络错误，请重试');
+    }
+}
+// ==================== 个人中心的收藏功能 ====================
+async function handleCollectInProfile(postId) {
+    if (!currentUser || !currentSession) {
+        alert('请先登录');
+        return;
+    }
+    
+    try {
+        // 检查是否已收藏
+        const checkResponse = await fetch(`${SUPABASE_URL}/rest/v1/favorites?user_id=eq.${currentUser.id}&post_id=eq.${postId}&select=id`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${currentSession.access_token}`
+            }
+        });
+        
+        if (!checkResponse.ok) {
+            console.error('检查收藏失败:', checkResponse.status);
+            alert('操作失败，请重试');
+            return;
+        }
+        
+        const existing = await checkResponse.json();
+        const isCollected = existing && existing.length > 0;
+        const collectIcon = document.querySelector('#detailCollectBtn i');
+        const collectCount = document.getElementById('detailCollect');
+        
+        if (isCollected) {
+            // 取消收藏
+            const deleteResponse = await fetch(`${SUPABASE_URL}/rest/v1/favorites?id=eq.${existing[0].id}`, {
+                method: 'DELETE',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${currentSession.access_token}`,
+                    'Prefer': 'return=minimal'
+                }
+            });
+            
+            if (deleteResponse.ok) {
+                // ✅ 获取最新收藏数
+                const countRes = await fetch(`${SUPABASE_URL}/rest/v1/favorites?post_id=eq.${postId}&select=id`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${currentSession.access_token}`
+                    }
+                });
+                const countData = await countRes.json();
+                const newCount = countData ? countData.length : 0;
+                
+                // 更新 posts 表的 collect_count 字段
+                await fetch(`${SUPABASE_URL}/rest/v1/posts?id=eq.${postId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${currentSession.access_token}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({ collect_count: newCount })
+                });
+                
+                if (collectIcon) collectIcon.classList.remove('text-light-green');
+                if (collectCount) collectCount.innerText = newCount;
+                
+                // 刷新收藏列表
+                renderCollectPost();
+                renderMyPost();
+            }
+        } else {
+            // 添加收藏
+            const insertResponse = await fetch(`${SUPABASE_URL}/rest/v1/favorites`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${currentSession.access_token}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({
+                    user_id: currentUser.id,
+                    post_id: postId
+                })
+            });
+            
+            if (insertResponse.ok) {
+                // ✅ 获取最新收藏数
+                const countRes = await fetch(`${SUPABASE_URL}/rest/v1/favorites?post_id=eq.${postId}&select=id`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${currentSession.access_token}`
+                    }
+                });
+                const countData = await countRes.json();
+                const newCount = countData ? countData.length : 0;
+                
+                // 更新 posts 表的 collect_count 字段
+                await fetch(`${SUPABASE_URL}/rest/v1/posts?id=eq.${postId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${currentSession.access_token}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({ collect_count: newCount })
+                });
+                
+                if (collectIcon) collectIcon.classList.add('text-light-green');
+                if (collectCount) collectCount.innerText = newCount;
+                
+                // 刷新收藏列表
+                renderCollectPost();
+                renderMyPost();
+            }
+        }
+    } catch (error) {
+        console.error('收藏错误:', error);
+        alert('网络错误，请重试');
+    }
+}
+// ==================== 加载评论 ====================
+async function loadComments(postId) {
+    const commentWrapEl = document.getElementById('commentWrap');
+    if (!commentWrapEl) return;
+    
+    const session = currentSession;
+    const isLoggedIn = session !== null;
+    
+    commentWrapEl.innerHTML = `
+        <div class="mb-3">
+            <div class="flex items-center gap-2">
+                <input id="commentInput" type="text" placeholder="${isLoggedIn ? '写下你的评论...' : '请先登录再评论'}" 
+                       class="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-light-green" 
+                       ${!isLoggedIn ? 'disabled' : ''}>
+                <button id="submitCommentBtn" class="bg-light-green text-white px-4 py-2 rounded-full text-sm hover:opacity-90 ${!isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}" 
+                        ${!isLoggedIn ? 'disabled' : ''}>
+                    发送
+                </button>
+            </div>
+        </div>
+        <div class="text-center text-gray-400 text-sm py-4">
+            <i class="fas fa-spinner fa-spin"></i> 加载中...
+        </div>
+    `;
+    
+    try {
+        const url = `${SUPABASE_URL}/rest/v1/comments?post_id=eq.${postId}&order=created_at.desc&limit=50`;
+        console.log('请求评论URL:', url);
+        
+        const response = await fetch(url, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`
+            }
+        });
+        
+        if (!response.ok) {
+            console.error('加载评论失败, 状态码:', response.status);
+            commentWrapEl.innerHTML = `<div class="text-center text-gray-400 text-sm py-4">加载评论失败</div>`;
+            return;
+        }
+        
+        const comments = await response.json();
+        console.log('评论数据:', comments);
+        
+        // ✅ 获取所有评论的用户ID（包括回复中的用户）
+        let allUserIds = [];
+        comments.forEach(c => {
+            if (c.user_id) allUserIds.push(c.user_id);
+        });
+        // 去重
+        const userIds = [...new Set(allUserIds)];
+        console.log('需要获取资料的用户ID:', userIds);
+        
+        // ✅ 获取用户资料
+        let userMap = {};
+        if (userIds.length > 0) {
+            try {
+                // 方法1：批量查询
+                const idsParam = userIds.map(id => `id=eq.${id}`).join('&');
+                const profileResponse = await fetch(`${SUPABASE_URL}/rest/v1/profiles?select=id,full_name,avatar_url&${idsParam}`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    }
+                });
+                
+                if (profileResponse.ok) {
+                    const profiles = await profileResponse.json();
+                    console.log('批量获取到的用户资料:', profiles);
+                    profiles.forEach(p => {
+                        userMap[p.id] = p;
+                    });
+                } else {
+                    console.error('批量获取用户资料失败, 状态码:', profileResponse.status);
+                }
+            } catch(e) {
+                console.error('批量获取用户资料异常:', e);
+            }
+            
+            // ✅ 方法2：对于没有获取到的用户，逐个查询
+            const missingUserIds = userIds.filter(id => !userMap[id]);
+            if (missingUserIds.length > 0) {
+                console.log('需要逐个获取的用户ID:', missingUserIds);
+                for (const uid of missingUserIds) {
+                    try {
+                        const singleResponse = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${uid}&select=id,full_name,avatar_url`, {
+                            headers: {
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`
+                            }
+                        });
+                        if (singleResponse.ok) {
+                            const data = await singleResponse.json();
+                            if (data && data.length > 0) {
+                                userMap[uid] = data[0];
+                                console.log(`✅ 获取到用户 ${uid} 的资料:`, data[0]);
+                            } else {
+                                console.log(`⚠️ 用户 ${uid} 没有profile，使用默认值`);
+                                userMap[uid] = { full_name: uid.substring(0, 8), avatar_url: 'https://picsum.photos/id/64/100/100' };
+                            }
+                        }
+                    } catch(e) {
+                        console.error(`获取用户 ${uid} 资料失败:`, e);
+                        userMap[uid] = { full_name: uid.substring(0, 8), avatar_url: 'https://picsum.photos/id/64/100/100' };
+                    }
+                }
+            }
+        }
+        
+        // 构建树形结构
+        const topComments = comments.filter(c => !c.parent_id);
+        const replyMap = {};
+        comments.forEach(c => {
+            if (c.parent_id) {
+                if (!replyMap[c.parent_id]) replyMap[c.parent_id] = [];
+                replyMap[c.parent_id].push(c);
+            }
+        });
+        
+        topComments.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+        Object.keys(replyMap).forEach(key => {
+            replyMap[key].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+        });
+        
+        let commentsHtml = '';
+        if (topComments.length > 0) {
+            topComments.forEach(cm => {
+                commentsHtml += renderComment(cm, userMap, session, replyMap, 0, isLoggedIn);
+            });
+        } else {
+            commentsHtml = `<div class="text-center text-gray-400 text-sm py-2">暂无评论，快来抢沙发！</div>`;
+        }
+        
+        commentWrapEl.innerHTML = `
+            <div class="mb-3">
+                <div class="flex items-center gap-2">
+                    <input id="commentInput" type="text" placeholder="${isLoggedIn ? '写下你的评论...' : '请先登录再评论'}" 
+                           class="flex-1 border border-gray-200 rounded-full px-4 py-2 text-sm focus:outline-none focus:border-light-green" 
+                           ${!isLoggedIn ? 'disabled' : ''}>
+                    <button id="submitCommentBtn" class="bg-light-green text-white px-4 py-2 rounded-full text-sm hover:opacity-90 ${!isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}" 
+                            ${!isLoggedIn ? 'disabled' : ''}>
+                        发送
+                    </button>
+                </div>
+            </div>
+            <div id="commentList">${commentsHtml}</div>
+        `;
+        
+        // 绑定事件...
+        document.querySelectorAll('.reply-btn').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const commentId = btn.dataset.commentId;
+                toggleReplyInput(commentId);
+            };
+        });
+        
+        document.querySelectorAll('.reply-submit-btn').forEach(btn => {
+            btn.onclick = async (e) => {
+                e.stopPropagation();
+                const parentId = btn.dataset.parentId;
+                const input = document.getElementById(`reply-input-${parentId}`);
+                if (input) {
+                    await submitReply(postId, parentId, input.value.trim(), session);
+                }
+            };
+        });
+        
+        document.querySelectorAll('.reply-cancel-btn').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const parentId = btn.dataset.parentId;
+                const container = document.getElementById(`reply-container-${parentId}`);
+                if (container) container.classList.add('hidden');
+            };
+        });
+        
+        document.querySelectorAll('.delete-comment-btn').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const commentId = btn.dataset.commentId;
+                deleteComment(commentId);
+            };
+        });
+        
+        const submitBtn = document.getElementById('submitCommentBtn');
+        const commentInput = document.getElementById('commentInput');
+        if (submitBtn && commentInput && isLoggedIn) {
+            submitBtn.onclick = async () => {
+                const text = commentInput.value.trim();
+                if (!text) {
+                    alert('请输入评论内容');
+                    return;
+                }
+                await submitReply(postId, null, text, session);
+            };
+        }
+    } catch (error) {
+        console.error('加载评论失败:', error);
+        commentWrapEl.innerHTML = '<div class="text-center text-gray-400 text-sm py-4">加载评论失败</div>';
+    }
+}
+function openRecordDetail(item) {
+    const recordImgEl = document.getElementById('recordImg');
+    const recordDescEl = document.getElementById('recordDesc');
+    const recordScopeSpan = document.getElementById('recordScope');
+    const recordTitleEl = document.querySelector('#recordDetailMask h3');
+    
+    if (recordTitleEl) {
+        recordTitleEl.innerHTML = `<i class="fa-solid fa-pen-to-square mr-2"></i>${item.name || '打卡详情'}`;
+    }
+    
+    if (recordImgEl) {
+        recordImgEl.src = item.img || 'https://picsum.photos/seed/default/400/300';
+        recordImgEl.onerror = function() {
+            this.src = 'https://picsum.photos/seed/default/400/300';
+        };
+    }
+    
+    if (recordDescEl) {
+        const content = item.content || '今天来到公园游玩，园区环境优美，空气清新，漫步休闲十分治愈。';
+        const timeStr = item.created_at ? new Date(item.created_at).toLocaleString('zh-CN') : '';
+        recordDescEl.innerHTML = `
+            <p class="text-gray-700 whitespace-pre-wrap">${content}</p>
+            ${timeStr ? `<p class="text-xs text-gray-400 mt-4">打卡时间：${timeStr}</p>` : ''}
+        `;
+    }
+    
+    if (recordScopeSpan) {
+        const visibility = item.visibility || 'public';
+        recordScopeSpan.innerText = visibility === 'public' ? '🌍 公开' : '🔒 私密';
+        recordScopeSpan.className = `px-4 py-1.5 rounded-full text-white ${visibility === 'public' ? 'bg-light-green' : 'bg-gray-500'}`;
+    }
+    
+    const recordDetailMaskDiv = document.getElementById('recordDetailMask');
+    if (recordDetailMaskDiv) recordDetailMaskDiv.classList.remove('hidden');
+}
+
+// ==================== 渲染单条评论 ====================
+function renderComment(cm, userMap, session, replyMap, depth = 0, isLoggedIn = false) {
+    const user = userMap[cm.user_id] || {};
+    const name = user.full_name || cm.user_id?.substring(0, 8) || '用户';
+    const avatar = user.avatar_url || 'https://picsum.photos/id/64/100/100';
+    const timeAgo = getTimeAgo(cm.created_at);
+    const isOwnComment = session && cm.user_id === session.user.id;
+    const replies = replyMap[cm.id] || [];
+    const indentClass = depth > 0 ? 'ml-8 border-l-2 border-gray-200 pl-3' : '';
+    const replyCount = replies.length;
+    
+    let html = `
+        <div class="comment-item ${indentClass}" id="comment-${cm.id}">
+            <div class="flex items-start gap-3 py-2 border-b border-gray-100">
+                <div class="w-8 h-8 rounded-full overflow-hidden shrink-0 mt-0.5">
+                    <img src="${avatar}" class="w-full h-full object-cover" onerror="this.src='https://picsum.photos/id/64/100/100'">
+                </div>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-xs font-medium text-gray-700">${name}</span>
+                        <span class="text-xs text-gray-400">· ${timeAgo}</span>
+                    </div>
+                    <div class="text-sm text-gray-700 mt-0.5">${cm.content}</div>
+                    <div class="flex items-center gap-3 mt-1">
+                        ${isLoggedIn ? `
+                            <button class="reply-btn text-xs text-gray-400 hover:text-light-green" data-comment-id="${cm.id}">
+                                回复 ${replyCount > 0 ? `(${replyCount})` : ''}
+                            </button>
+                        ` : ''}
+                        ${isOwnComment ? `
+                            <button class="delete-comment-btn text-xs text-gray-400 hover:text-red-500" data-comment-id="${cm.id}">
+                                删除
+                            </button>
+                        ` : ''}
+                    </div>
+                    <div id="reply-container-${cm.id}" class="hidden mt-2 flex items-center gap-2">
+                        <input id="reply-input-${cm.id}" type="text" placeholder="回复 ${name}..." 
+                               class="flex-1 border border-gray-200 rounded-full px-3 py-1.5 text-sm focus:outline-none focus:border-light-green">
+                        <button class="reply-submit-btn bg-light-green text-white px-3 py-1.5 rounded-full text-xs hover:opacity-90" data-parent-id="${cm.id}">
+                            回复
+                        </button>
+                        <button class="reply-cancel-btn text-xs text-gray-400 hover:text-gray-600" data-parent-id="${cm.id}">
+                            取消
+                        </button>
+                    </div>
+                    ${replies.length > 0 ? `<div class="mt-1">${replies.map(r => renderComment(r, userMap, session, replyMap, depth + 1, isLoggedIn)).join('')}</div>` : ''}
+                </div>
+            </div>
+        </div>
+    `;
+    return html;
+}
+
+// ==================== 切换回复输入框 ====================
+function toggleReplyInput(commentId) {
+    const container = document.getElementById(`reply-container-${commentId}`);
+    if (container) {
+        container.classList.toggle('hidden');
+        const input = document.getElementById(`reply-input-${commentId}`);
+        if (input && !container.classList.contains('hidden')) {
+            input.focus();
+        }
+    }
+}
+
+// ==================== 提交回复 ====================
+async function submitReply(postId, parentId, content, session) {
+    if (!content) {
+        alert('请输入内容');
+        return;
+    }
+    
+    if (!session) {
+        alert('请先登录');
+        return;
+    }
+    
+    try {
+        const insertResponse = await fetch(`${SUPABASE_URL}/rest/v1/comments`, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${session.access_token}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify({
+                post_id: postId,
+                user_id: session.user.id,
+                content: content,
+                parent_id: parentId || null,
+                created_at: new Date().toISOString()
+            })
+        });
+        
+        if (insertResponse.ok) {
+            loadComments(postId);
+            updateCommentCount(postId);
+        } else {
+            const error = await insertResponse.text();
+            console.error('评论失败:', error);
+            alert('评论失败，请重试');
+        }
+    } catch (error) {
+        console.error('评论错误:', error);
+        alert('网络错误，请重试');
+    }
+}
+
+// ==================== 删除评论 ====================
+let pendingDeleteCommentId = null;
+
+async function deleteComment(commentId) {
+    const session = currentSession;
+    if (!session) {
+        alert('请先登录');
+        return;
+    }
+    
+    pendingDeleteCommentId = commentId;
+    const mask = document.getElementById('deleteConfirmMask');
+    if (mask) mask.classList.remove('hidden');
+}
+
+document.getElementById('confirmDeleteBtn')?.addEventListener('click', async function() {
+    const commentId = pendingDeleteCommentId;
+    if (!commentId) return;
+    
+    const session = currentSession;
+    if (!session) {
+        alert('请先登录');
+        return;
+    }
+    
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/comments?id=eq.${commentId}`, {
+            method: 'DELETE',
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${session.access_token}`,
+                'Prefer': 'return=minimal'
+            }
+        });
+        
+        if (response.ok) {
+            const commentEl = document.getElementById(`comment-${commentId}`);
+            if (commentEl) {
+                commentEl.remove();
+            }
+            const commentList = document.getElementById('commentList');
+            if (commentList && commentList.children.length === 0) {
+                commentList.innerHTML = `<div class="text-center text-gray-400 text-sm py-2">暂无评论，快来抢沙发！</div>`;
+            }
+            document.getElementById('deleteConfirmMask')?.classList.add('hidden');
+            pendingDeleteCommentId = null;
+        } else {
+            const error = await response.text();
+            console.error('删除失败:', error);
+            alert('删除失败，请重试');
+            document.getElementById('deleteConfirmMask')?.classList.add('hidden');
+            pendingDeleteCommentId = null;
+        }
+    } catch (error) {
+        console.error('删除错误:', error);
+        alert('网络错误，请重试');
+        document.getElementById('deleteConfirmMask')?.classList.add('hidden');
+        pendingDeleteCommentId = null;
+    }
+});
+
+document.getElementById('cancelDeleteBtn')?.addEventListener('click', function() {
+    document.getElementById('deleteConfirmMask')?.classList.add('hidden');
+    pendingDeleteCommentId = null;
+});
+
+document.getElementById('deleteConfirmMask')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        this.classList.add('hidden');
+        pendingDeleteCommentId = null;
+    }
+});
+
+// ==================== 更新评论数 ====================
+async function updateCommentCount(postId) {
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/comments?post_id=eq.${postId}&select=id`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`
+            }
+        });
+        const comments = await response.json();
+        const count = comments ? comments.length : 0;
+        
+        const detailCommentEl = document.getElementById('detailComment');
+        if (detailCommentEl) detailCommentEl.innerText = count;
+        
+    } catch (error) {
+        console.error('更新评论数失败:', error);
+    }
+}
+
+// ==================== 事件绑定 ====================
+if (showLoginBtn) showLoginBtn.onclick = () => { if (loginMask) loginMask.classList.remove('hidden'); };
+if (closeLoginMask) closeLoginMask.onclick = () => { if (loginMask) loginMask.classList.add('hidden'); };
+if (loginMask) loginMask.onclick = (e) => { if (e.target === loginMask) loginMask.classList.add('hidden'); };
+if (switchToRegisterLink) {
+    switchToRegisterLink.onclick = (e) => {
+        e.preventDefault();
+        if (loginFormDiv) loginFormDiv.classList.add('hidden');
+        if (registerFormDiv) registerFormDiv.classList.remove('hidden');
+        const title = document.getElementById('loginTitle');
+        if (title) title.innerText = '注册';
+    };
+}
+if (switchToLoginLink) {
+    switchToLoginLink.onclick = (e) => {
+        e.preventDefault();
+        if (loginFormDiv) loginFormDiv.classList.remove('hidden');
+        if (registerFormDiv) registerFormDiv.classList.add('hidden');
+        const title = document.getElementById('loginTitle');
+        if (title) title.innerText = '登录';
+    };
+}
+if (doLoginBtn) {
+    doLoginBtn.onclick = () => {
+        const email = document.getElementById('loginEmail')?.value;
+        const password = document.getElementById('loginPassword')?.value;
+        if (!email || !password) showMessage('请填写邮箱和密码');
+        else login(email, password);
+    };
+}
+if (doRegisterBtn) {
+    doRegisterBtn.onclick = () => {
+        const name = document.getElementById('regName')?.value;
+        const email = document.getElementById('regEmail')?.value;
+        const password = document.getElementById('regPassword')?.value;
+        if (!name || !email || !password) showMessage('请填写完整信息');
+        else if (password.length < 6) showMessage('密码至少6位');
+        else register(email, password, name);
+    };
+}
+if (logoutBtn) logoutBtn.onclick = () => logout();
+
+// ==================== 编辑资料弹窗 ====================
+const editMaskEl = document.getElementById('editMask');
+const editBtnEl = document.getElementById('editBtn');
+const btnCancelEl = document.getElementById('btnCancel');
+const btnSaveEl = document.getElementById('btnSave');
+const avatarFileInput = document.getElementById('avatarFile');
+const previewAvatarImg = document.getElementById('previewAvatar');
+
+if (editBtnEl) editBtnEl.onclick = () => { 
+    loadUserProfile();
+    if (editMaskEl) editMaskEl.classList.remove('hidden'); 
+};
+if (btnCancelEl) btnCancelEl.onclick = () => { if (editMaskEl) editMaskEl.classList.add('hidden'); };
+if (editMaskEl) editMaskEl.onclick = (e) => { if (e.target === editMaskEl) editMaskEl.classList.add('hidden'); };
+if (avatarFileInput) {
+    avatarFileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => { if (previewAvatarImg) previewAvatarImg.src = ev.target.result; };
+        reader.readAsDataURL(file);
+    };
+}
+
+if (btnSaveEl) {
+    btnSaveEl.onclick = async () => {
+        const newName = inputNickField?.value?.trim() || '';
+        const newBio = document.getElementById('inputDesc')?.value?.trim() || '';
+        
+        if (!currentUser || !currentSession) {
+            alert('请先登录');
+            return;
+        }
+        
+        const avatarFile = document.getElementById('avatarFile')?.files?.[0];
+        let avatarUrl = null;
+        
+        if (avatarFile) {
+            try {
+                const fileExt = avatarFile.name.split('.').pop();
+                const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
+                const filePath = `avatars/${fileName}`;
+                
+                const uploadResponse = await fetch(`${SUPABASE_URL}/storage/v1/object/avatars/${filePath}`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${currentSession.access_token}`,
+                        'Content-Type': avatarFile.type
+                    },
+                    body: avatarFile
+                });
+                
+                if (uploadResponse.ok) {
+                    avatarUrl = `${SUPABASE_URL}/storage/v1/object/public/avatars/${filePath}`;
+                } else {
+                    const errorText = await uploadResponse.text();
+                    console.error('头像上传失败:', errorText);
+                    alert('头像上传失败，请重试');
+                    return;
+                }
+            } catch (error) {
+                console.error('头像上传错误:', error);
+                alert('头像上传失败，请重试');
+                return;
+            }
+        }
+        
+        try {
+            const updateData = {
+                full_name: newName,
+                bio: newBio,
+                updated_at: new Date().toISOString()
+            };
+            if (avatarUrl) {
+                updateData.avatar_url = avatarUrl;
+            }
+            
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${currentUser.id}`, {
+                method: 'PATCH',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${currentSession.access_token}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify(updateData)
+            });
+            
+            if (response.ok) {
+                if (profileName) profileName.innerText = newName;
+                if (avatarUrl) {
+                    document.getElementById('profileAvatar').src = avatarUrl;
+                    document.getElementById('topAvatar').src = avatarUrl;
+                    document.getElementById('previewAvatar').src = avatarUrl;
+                }
+                alert('✅ 修改成功！');
+                if (editMaskEl) editMaskEl.classList.add('hidden');
+                loadUserProfile();
+            } else {
+                const error = await response.text();
+                console.error('保存失败:', error);
+                alert('❌ 保存失败，请查看控制台错误');
+            }
+        } catch (error) {
+            console.error('保存错误:', error);
+            alert('❌ 网络错误，请稍后重试');
+        }
+    };
+}
+
+// ==================== 隐私设置弹窗 ====================
+const settingMaskEl = document.getElementById('settingMask');
+const settingTopBtn = document.getElementById('settingTopBtn');
+const setCancelBtn = document.getElementById('setCancel');
+const setSaveBtn = document.getElementById('setSave');
+if (settingTopBtn) settingTopBtn.onclick = () => { if (settingMaskEl) settingMaskEl.classList.remove('hidden'); };
+if (setCancelBtn) setCancelBtn.onclick = () => { if (settingMaskEl) settingMaskEl.classList.add('hidden'); };
+if (settingMaskEl) settingMaskEl.onclick = (e) => { if (e.target === settingMaskEl) settingMaskEl.classList.add('hidden'); };
+if (setSaveBtn) {
+    setSaveBtn.onclick = async () => {
+        if (!currentUser || !currentSession) {
+            alert('请先登录');
+            return;
+        }
+        
+        const val = document.querySelector('input[name="scope"]:checked');
+        const visibility = val ? val.value : 'public';
+        
+        try {
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${currentUser.id}`, {
+                method: 'PATCH',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${currentSession.access_token}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({
+                    post_visibility: visibility,
+                    updated_at: new Date().toISOString()
+                })
+            });
+            
+            if (response.ok) {
+                alert(`✅ 已设置：帖子全部【${visibility === 'public' ? '公开' : '私密'}】`);
+                if (settingMaskEl) settingMaskEl.classList.add('hidden');
+                // 刷新用户资料
+                loadUserProfile();
+            } else {
+                const error = await response.text();
+                console.error('保存失败:', error);
+                alert('❌ 保存失败，请重试');
+            }
+        } catch (error) {
+            console.error('保存设置错误:', error);
+            alert('❌ 网络错误，请重试');
+        }
+    };
+}
+
+// ==================== 关注/粉丝弹窗 ====================
+const followBtnEl = document.getElementById('followBtn');
+const fansBtnEl = document.getElementById('fansBtn');
+const userListMaskEl = document.getElementById('userListMask');
+const userListWrapEl = document.getElementById('userListWrap');
+const userListCloseBtn = document.getElementById('userListClose');
+const userTabItems = document.querySelectorAll('.user-tab');
+
+let currentUserListType = 'follow';
+
+async function renderUserList(type) {
+    const wrap = document.getElementById('userListWrap');
+    if (!wrap) return;
+    
+    if (!currentUser || !currentSession) {
+        wrap.innerHTML = '<div class="text-center text-gray-400 py-10">请先登录</div>';
+        return;
+    }
+    
+    wrap.innerHTML = `
+        <div class="text-center text-gray-400 py-10">
+            <i class="fas fa-spinner fa-spin"></i> 加载中...
+        </div>
+    `;
+    
+    try {
+        let url;
+        if (type === 'follow') {
+            // 我关注的人
+            url = `${SUPABASE_URL}/rest/v1/follows?follower_id=eq.${currentUser.id}&select=following_id`;
+        } else {
+            // 关注我的人（粉丝）
+            url = `${SUPABASE_URL}/rest/v1/follows?following_id=eq.${currentUser.id}&select=follower_id`;
+        }
+        
+        const response = await fetch(url, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${currentSession.access_token}`
+            }
+        });
+        
+        if (!response.ok) {
+            console.error('加载失败:', response.status);
+            wrap.innerHTML = '<div class="text-center text-gray-400 py-10">加载失败</div>';
+            return;
+        }
+        
+        const data = await response.json();
+        console.log(`${type} 数据:`, data);
+        
+        if (!data || data.length === 0) {
+            wrap.innerHTML = `
+                <div class="text-center text-gray-400 py-10">
+                    <div class="text-4xl mb-3">👤</div>
+                    <p>${type === 'follow' ? '还没有关注任何人' : '还没有粉丝'}</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // 提取用户ID列表
+        const userIds = data.map(item => type === 'follow' ? item.following_id : item.follower_id).filter(id => id);
+        
+        // 获取用户资料
+        const idsParam = userIds.map(id => `id=eq.${id}`).join('&');
+        const profileRes = await fetch(`${SUPABASE_URL}/rest/v1/profiles?select=id,full_name,avatar_url,bio&${idsParam}`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${currentSession.access_token}`
+            }
+        });
+        
+        const profiles = await profileRes.json();
+        console.log('用户资料:', profiles);
+        
+        if (!profiles || profiles.length === 0) {
+            wrap.innerHTML = '<div class="text-center text-gray-400 py-10">暂无数据</div>';
+            return;
+        }
+        
+        wrap.innerHTML = '';
+        profiles.forEach(user => {
+            const div = document.createElement('div');
+            div.className = 'flex items-center gap-4 py-3 border-b border-gray-100 cursor-pointer hover:bg-gray-50 px-2 rounded-lg transition';
+            div.innerHTML = `
+                <div class="w-12 h-12 rounded-full overflow-hidden shrink-0">
+                    <img src="${user.avatar_url || 'https://picsum.photos/id/64/100/100'}" class="w-full h-full object-cover">
+                </div>
+                <div class="flex-1">
+                    <div class="font-medium text-deep-green">${user.full_name || '用户'}</div>
+                    <div class="text-xs text-gray-400 truncate">${user.bio || '这个人很懒，还没写简介~'}</div>
+                </div>
+                <button class="goto-user-btn text-sm text-light-green hover:underline" data-user-id="${user.id}">
+                    查看主页
+                </button>
+            `;
+            // 点击查看用户主页
+            div.onclick = () => {
+                window.location.href = `用户主页.html?userId=${user.id}`;
+            };
+            wrap.appendChild(div);
+        });
+        
+    } catch (error) {
+        console.error('加载用户列表错误:', error);
+        wrap.innerHTML = '<div class="text-center text-gray-400 py-10">加载失败，请刷新重试</div>';
+    }
+}
+// ==================== 绑定关注/粉丝点击事件 ====================
+// 点击"关注"打开弹窗
+if (followBtnEl) {
+    followBtnEl.onclick = () => {
+        currentUserListType = 'follow';
+        userTabItems.forEach(tab => {
+            tab.classList.remove('text-light-green', 'border-b-2', 'border-light-green');
+            tab.classList.add('text-gray-500');
+            if (tab.dataset.type === 'follow') {
+                tab.classList.add('text-light-green', 'border-b-2', 'border-light-green');
+                tab.classList.remove('text-gray-500');
+            }
+        });
+        userListMaskEl.classList.remove('hidden');
+        renderUserList('follow');
+    };
+}
+
+// 点击"粉丝"打开弹窗
+if (fansBtnEl) {
+    fansBtnEl.onclick = () => {
+        currentUserListType = 'fans';
+        userTabItems.forEach(tab => {
+            tab.classList.remove('text-light-green', 'border-b-2', 'border-light-green');
+            tab.classList.add('text-gray-500');
+            if (tab.dataset.type === 'fans') {
+                tab.classList.add('text-light-green', 'border-b-2', 'border-light-green');
+                tab.classList.remove('text-gray-500');
+            }
+        });
+        userListMaskEl.classList.remove('hidden');
+        renderUserList('fans');
+    };
+}
+
+// Tab切换
+userTabItems.forEach(tab => {
+    tab.onclick = () => {
+        const type = tab.dataset.type;
+        currentUserListType = type;
+        userTabItems.forEach(t => {
+            t.classList.remove('text-light-green', 'border-b-2', 'border-light-green');
+            t.classList.add('text-gray-500');
+        });
+        tab.classList.add('text-light-green', 'border-b-2', 'border-light-green');
+        tab.classList.remove('text-gray-500');
+        renderUserList(type);
+    };
+});
+
+// 关闭弹窗
+if (userListCloseBtn) {
+    userListCloseBtn.onclick = () => {
+        userListMaskEl.classList.add('hidden');
+    };
+}
+
+if (userListMaskEl) {
+    userListMaskEl.onclick = (e) => {
+        if (e.target === userListMaskEl) {
+            userListMaskEl.classList.add('hidden');
+        }
+    };
+}
+
+// ==================== 关闭弹窗 ====================
+const closePostDetailBtn = document.getElementById('closePostDetail');
+const postDetailMaskDiv = document.getElementById('postDetailMask');
+if (closePostDetailBtn) closePostDetailBtn.onclick = () => { 
+    if (postDetailMaskDiv) postDetailMaskDiv.classList.add('hidden');
+    currentOpenPostId = null;
+};
+if (postDetailMaskDiv) postDetailMaskDiv.onclick = (e) => { 
+    if (e.target === postDetailMaskDiv) {
+        postDetailMaskDiv.classList.add('hidden');
+        currentOpenPostId = null;
+    }
+};
+
+const closeRecordDetailBtn = document.getElementById('closeRecordDetail');
+const recordDetailMaskDiv = document.getElementById('recordDetailMask');
+if (closeRecordDetailBtn) closeRecordDetailBtn.onclick = () => { if (recordDetailMaskDiv) recordDetailMaskDiv.classList.add('hidden'); };
+if (recordDetailMaskDiv) recordDetailMaskDiv.onclick = (e) => { if (e.target === recordDetailMaskDiv) recordDetailMaskDiv.classList.add('hidden'); };
+
+// ==================== 页面初始化 ====================
+checkSession();
+
+// ==================== 时间格式化 ====================
+function getTimeAgo(dateStr) {
+    if (!dateStr) return '刚刚';
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000);
+    if (diff < 60) return '刚刚';
+    if (diff < 3600) return Math.floor(diff / 60) + '分钟前';
+    if (diff < 86400) return Math.floor(diff / 3600) + '小时前';
+    if (diff < 2592000) return Math.floor(diff / 86400) + '天前';
+    return date.toLocaleDateString('zh-CN');
+}
+// ==================== 删除打卡 ====================
+let pendingDeleteCheckinId = null;
+
+async function deleteCheckin(checkinId) {
+    if (!currentUser || !currentSession) {
+        alert('请先登录');
+        return;
+    }
+    
+    // 显示自定义弹窗
+    pendingDeleteCheckinId = checkinId;
+    document.getElementById('deleteCheckinMask').classList.remove('hidden');
+}
+
+// 确认删除打卡
+document.getElementById('confirmDeleteCheckinBtn')?.addEventListener('click', async function() {
+    const checkinId = pendingDeleteCheckinId;
+    if (!checkinId) return;
+    
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/checkins?id=eq.${checkinId}`, {
+            method: 'DELETE',
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${currentSession.access_token}`,
+                'Prefer': 'return=minimal'
+            }
+        });
+        
+        if (response.ok) {
+            document.getElementById('deleteCheckinMask').classList.add('hidden');
+            pendingDeleteCheckinId = null;
+            renderMyRecord();
+        } else {
+            const error = await response.text();
+            console.error('删除失败:', error);
+            alert('❌ 删除失败，请重试');
+        }
+    } catch (error) {
+        console.error('删除错误:', error);
+        alert('❌ 网络错误，请重试');
+    }
+});
+
+// 取消删除打卡
+document.getElementById('cancelDeleteCheckinBtn')?.addEventListener('click', function() {
+    document.getElementById('deleteCheckinMask').classList.add('hidden');
+    pendingDeleteCheckinId = null;
+});
+
+// 点击遮罩关闭
+document.getElementById('deleteCheckinMask')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        this.classList.add('hidden');
+        pendingDeleteCheckinId = null;
+    }
+});
+</script>
+</body>
+</html>

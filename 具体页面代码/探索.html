@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html class="light" lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>探索 | 深圳绿洲 - 城市绿洲探索指南</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.geekzu.org/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      background: linear-gradient(to bottom, #1B3C35 0%, #1B3C35 12%, #f8fbf8 12%, #ffffff 100%);
+      background-attachment: fixed;
+    }
+    .organic-clip { border-radius: 3rem 1.5rem 4rem 2rem; }
+    @keyframes float {0%,100%{transform: translateY(0px);}50%{transform: translateY(-20px);}}
+    .animate-float {animation: float 6s ease-in-out infinite;}
+    @keyframes pulse-ring {0%{transform:scale(0.33);opacity:0.8;}80%,100%{transform:scale(1.2);opacity:0;}}
+    .marker-pulse::before {content:'';position:absolute;width:100%;height:100%;background-color:#40E0D0;border-radius:50%;animation:pulse-ring 2s cubic-bezier(0.215,0.61,0.355,1) infinite;transition:background-color 0.2s ease;}
+    .group:hover .marker-pulse::before {background-color:#FF69B4;}
+    .detail-card-wrap{transition: transform 0.22s ease-out;}
+    @keyframes refreshIn{0%{opacity:0;transform:translateY(20px);}100%{opacity:1;transform:translateY(0);}}
+    .refresh-animate{animation:refreshIn 0.4s ease-out forwards;}
+    .post-card{opacity:0;transform:translateY(30px);transition:all 0.6s ease-out;}
+    .post-card.show{opacity:1;transform:translateY(0);}
+    .post-card {
+        cursor: pointer;
+        transition: transform 0.2s, opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+    .post-card:hover {
+        transform: translateY(-6px);
+    }
+    .fa-icon { font-size: 1.25rem; vertical-align: middle; }
+    .fa-icon-sm { font-size: 0.875rem; vertical-align: middle; }
+    .fa-icon-lg { font-size: 1.875rem; vertical-align: middle; }
+    
+    /* 搜索下拉建议样式 */
+    .search-suggestions {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: white;
+        border-radius: 1.5rem;
+        margin-top: 0.5rem;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        z-index: 100;
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #e5e7eb;
+    }
+    .search-suggestion-item {
+        padding: 12px 20px;
+        cursor: pointer;
+        transition: background 0.2s;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    .search-suggestion-item:hover {
+        background: #f0fdf4;
+    }
+    .search-suggestion-item:last-child {
+        border-bottom: none;
+    }
+    .search-highlight {
+        background: #ffe5b4;
+        font-weight: bold;
+    }
+    .search-container {
+        position: relative;
+    }
+    /* Toast 提示样式 */
+.toast-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    pointer-events: none;
+}
+.toast-message {
+    background: rgba(27, 60, 53, 0.92);
+    backdrop-filter: blur(12px);
+    color: white;
+    padding: 20px 40px;
+    border-radius: 1.5rem;
+    font-size: 16px;
+    font-weight: 500;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    transform: scale(0.9);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.toast-message.show {
+    transform: scale(1);
+    opacity: 1;
+}
+.toast-message .toast-icon {
+    font-size: 24px;
+}
+.toast-message.success .toast-icon {
+    color: #00f5ff;
+}
+.toast-message.error .toast-icon {
+    color: #ff6b6b;
+}
+</style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "on-tertiary-fixed-variant": "#0e5138","on-surface-variant": "#5b403a","error-container": "#ffdad6","surface-container-low": "#f7f3ee","surface-container": "#f1ede8","on-tertiary-container": "#00311f","on-secondary-fixed": "#001847","surface-container-high": "#ebe8e3","primary-fixed": "#ffdad3","tertiary-fixed": "#b1f0ce","on-secondary-container": "#fefcff","surface-dim": "#ddd9d5","on-tertiary-fixed": "#002114","on-surface": "#1c1c19","surface-tint": "#b72301","tertiary-fixed-dim": "#95d4b3","secondary-fixed-dim": "#b2c5ff","error": "#ba1a1a","surface-container-lowest": "#ffffff","surface-bright": "#fdf9f4","on-error-container": "#93000a","inverse-on-surface": "#f4f0eb","secondary-container": "#316ee9","tertiary-container": "#609d7f","background": "transparent","primary-container": "#ff5733","on-primary-container": "#580c00","on-primary-fixed-variant": "#8c1800","inverse-surface": "#31302d","secondary": "#0054cd","surface": "#fdf9f4","inverse-primary": "#ffb4a4","on-primary-fixed": "#3d0600","surface-container-highest": "#e6e2dd","on-secondary-fixed-variant": "#0040a1","on-secondary": "#ffffff","primary": "#b72301","on-tertiary": "#ffffff","on-background": "#1c1c19","secondary-fixed": "#dae2ff","tertiary": "#2c694e","on-primary": "#ffffff","outline-variant": "#e4beb6","surface-variant": "#e6e2dd","outline": "#8f7069","on-error": "#ffffff","primary-fixed-dim": "#ffb4a4","y2k-pink": "#ff85c0","y2k-cyan": "#00f5ff"
+          },
+          "borderRadius": {"DEFAULT": "1rem","lg": "2rem","xl": "3rem","full": "9999px"},
+          "spacing": {"container-padding": "24px","unit": "8px","gutter": "16px","section-gap": "48px"},
+          "fontFamily": {"serif": ["Georgia", "Times New Roman", "serif"],"handwriting": ["Kalam", "cursive"],"typewriter": ["Courier Prime", "monospace"],"plus-jakarta": ["Plus Jakarta Sans", "sans-serif"]},
+          "fontSize": {"label-sm": ["12px",{"lineHeight":"1.2","fontWeight":"400"}],"label-lg": ["14px",{"lineHeight":"1.2","fontWeight":"500"}],"headline-xl": ["48px",{"lineHeight":"1.1","letterSpacing":"-0.02em","fontWeight":"700","fontFamily":"Kalam, cursive"}],"body-lg": ["18px",{"lineHeight":"1.6","fontWeight":"400"}],"headline-md": ["24px",{"lineHeight":"1.3","fontWeight":"700"}],"headline-lg": ["32px",{"lineHeight":"1.2","letterSpacing":"-0.01em","fontWeight":"700"}],"body-md": ["16px",{"lineHeight":"1.6","fontWeight":"400"}]}
+        }
+      }
+    }
+</script>
+</head>
+<body class="text-on-surface">
+
+<!-- 导航栏 -->
+<nav class="flex justify-between items-center px-container-padding w-full" style="background-color: transparent; border-bottom: none; padding: 16px 24px; position: fixed; top: 0; left: 0; right: 0; z-index: 50;">
+<div class="font-headline-xl text-headline-xl font-black text-y2k-pink drop-shadow-sm">oasis</div>
+<div class="hidden md:flex items-center rounded-full mx-auto px-8 gap-20 py-1" style="background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 40px; padding: 2px 48px; box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 20px; display: inline-flex; min-width: 700px; max-width: 900px; justify-content: center;">
+    <a class="text-y2k-pink font-semibold text-body-md px-4 py-2 rounded-[20px] transition-all duration-200 hover:text-white hover:bg-[#FF69B4]" href="index.html" style="font-family: 'Plus Jakarta Sans', sans-serif;">首页</a>
+  <a class="bg-y2k-pink text-white font-semibold text-body-md px-4 py-2 rounded-[20px] transition-all duration-200" href="探索.html" style="font-family: 'Plus Jakarta Sans', sans-serif;">探索</a>
+  <a class="text-y2k-pink font-semibold text-body-md px-4 py-2 rounded-[20px] transition-all duration-200 hover:text-white hover:bg-[#FF69B4]" href="寻找公园.html" style="font-family: 'Plus Jakarta Sans', sans-serif;">寻找公园</a>
+  <a class="text-y2k-pink font-semibold text-body-md px-4 py-2 rounded-[20px] transition-all duration-200 hover:text-white hover:bg-[#FF69B4]" href="社区.html" style="font-family: 'Plus Jakarta Sans', sans-serif;">社区</a>
+  <a class="text-y2k-pink font-semibold text-body-md px-4 py-2 rounded-[20px] transition-all duration-200 hover:text-white hover:bg-[#FF69B4]" href="我的足迹.html" style="font-family: 'Plus Jakarta Sans', sans-serif;">我的足迹</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="bg-y2k-pink text-on-primary-container px-6 py-2 rounded-full font-label-lg text-label-lg hover:scale-105 transition-transform shadow-lg shadow-y2k-pink/20" style="font-family: 'Plus Jakarta Sans', sans-serif;" onclick="window.location.href='个人中心.html'">个人中心</button>
+</div>
+</nav>
+
+<main class="pt-32 px-container-padding">
+  <div class="mx-auto max-w-2xl mb-12 search-container">
+    <div class="bg-white/70 backdrop-blur-lg rounded-full px-6 flex items-center gap-4 border-2 border-y2k-cyan/30 focus-within:border-y2k-cyan transition-all shadow-xl py-2">
+      <i class="fas fa-search text-y2k-cyan text-xl fa-icon"></i>
+      <input id="searchInput" class="bg-transparent border-none focus:ring-0 w-full text-body-md font-body-md text-on-surface placeholder:text-on-surface-variant/60" placeholder="寻找你身边的城市绿洲、按区域/标签搜索..." type="text" autocomplete="off">
+      <button id="searchBtn" class="bg-y2k-cyan text-on-secondary-fixed px-5 py-2 rounded-full font-label-lg text-label-lg shadow-lg shadow-y2k-cyan/30 whitespace-nowrap min-w-[90px]">搜索公园</button>
+    </div>
+    <div id="suggestionsDropdown" class="search-suggestions hidden"></div>
+  </div>
+
+  <div class="flex items-center gap-4 mb-6">
+    <h2 class="font-headline-lg text-headline-lg">随机推荐 · 深圳宝藏公园</h2>
+    <button id="refreshPark" class="flex items-center gap-1 px-3 py-1.5 bg-tertiary/10 hover:bg-tertiary/20 rounded-full text-label-sm transition-all">
+      <i class="fas fa-sync-alt text-sm fa-icon-sm"></i>刷新下一批
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-7 gap-8 mb-20">
+    <div class="lg:col-span-4 flex flex-col gap-6 max-h-[75vh] overflow-y-auto" id="leftScroll">
+      <div class="text-center py-10 text-gray-400">加载中...</div>
+    </div>
+    <div class="lg:col-span-3 sticky top-32 max-h-[75vh] overflow-hidden">
+      <div class="detail-card-wrap" id="rightScroll">
+        <div class="text-center py-10 text-gray-400">加载中...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 社区帖子 -->
+  <div class="mb-16" id="postWrapBox">
+    <div class="flex items-center gap-4 mb-6">
+      <h2 class="font-headline-lg text-headline-lg">社区热门帖子</h2>
+      <button id="refreshPost" class="flex items-center gap-1 px-3 py-1.5 bg-tertiary/10 hover:bg-tertiary/20 rounded-full text-label-sm transition-all">
+        <i class="fas fa-sync-alt text-sm fa-icon-sm"></i>刷新下一批
+      </button>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="postGrid">
+      <div class="col-span-full text-center py-10 text-gray-400">加载中...</div>
+    </div>
+  </div>
+</main>
+
+<footer class="w-full py-section-gap px-container-padding flex flex-col md:flex-row justify-between items-center gap-gutter bg-white/10 backdrop-blur-md rounded-t-[4rem] mt-20">
+<div class="flex flex-col items-center md:items-start gap-4">
+<div class="font-headline-md text-headline-md font-bold text-y2k-pink">oasis</div>
+<p class="text-sm text-gray-500">© 2026 深圳绿洲(Shenzhen Oasis). 重拾城市宁静 | 地图数据 © 高德地图</p>
+</div>
+<div class="flex gap-8">
+<a class="text-on-surface-variant font-medium text-body-md hover:text-y2k-cyan transition-colors" href="#">关于我们</a>
+<a class="text-on-surface-variant font-medium text-body-md hover:text-y2k-cyan transition-colors" href="#">加入社区</a>
+<a class="text-on-surface-variant font-medium text-body-md hover:text-y2k-cyan transition-colors" href="#">隐私政策</a>
+<a class="text-on-surface-variant font-medium text-body-md hover:text-y2k-cyan transition-colors" href="#">服务条款</a>
+</div>
+<div class="flex gap-4">
+<div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-on-surface-variant cursor-pointer hover:text-y2k-cyan transition-colors"><i class="fas fa-share-alt text-on-surface-variant"></i></div>
+<div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-on-surface-variant cursor-pointer hover:text-y2k-cyan transition-colors"><i class="fas fa-globe text-on-surface-variant"></i></div>
+</div>
+</footer>
+
+<button class="fixed bottom-8 right-8 bg-y2k-cyan text-on-secondary-fixed w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-40 border-4 border-white">
+<i class="fas fa-plus text-2xl text-on-secondary-fixed"></i>
+</button>
+
+<!-- 帖子详情弹窗 -->
+<div id="postDetailMask" class="fixed inset-0 bg-black/50 z-[1000] hidden flex items-center justify-center p-6">
+    <div class="organic-sm bg-white w-full max-w-[1080px] max-h-[88vh] flex overflow-hidden shadow-xl" style="border-radius: 1.5rem;">
+        <div class="w-[55%] bg-gray-100 shrink-0">
+            <img id="detailImg" src="" class="w-full h-full object-cover">
+        </div>
+        <div class="w-[45%] flex flex-col p-6 overflow-y-auto">
+            <div class="flex justify-between items-center mb-5">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full overflow-hidden">
+                        <img id="detailAvatar" src="https://picsum.photos/id/64/100/100" class="w-full h-full object-cover">
+                    </div>
+                    <span id="detailName" class="font-medium text-deep-green">用户名</span>
+                </div>
+                <button id="closePostDetail" class="w-8 h-8 rounded-full border border-gray-300 hover:bg-gray-100">×</button>
+            </div>
+            <h3 id="detailTitle" class="text-xl font-bold text-deep-green mb-3"></h3>
+            <p id="detailDesc" class="text-gray-700 leading-relaxed mb-5"></p>
+            <div id="detailTagWrap" class="flex flex-wrap gap-2 mb-6"></div>
+            <div class="border-t border-gray-200 my-4"></div>
+            <div class="flex gap-6 mb-5">
+                <div class="flex items-center gap-1.5 cursor-pointer text-gray-600 hover:text-y2k-pink">
+                    <i class="fas fa-heart"></i>
+                    <span id="detailLike">0</span>
+                </div>
+                <div class="flex items-center gap-1.5 cursor-pointer text-gray-600 hover:text-light-green">
+                    <i class="fas fa-bookmark"></i>
+                    <span id="detailCollect">0</span>
+                </div>
+                <div class="flex items-center gap-1.5 cursor-pointer text-gray-600 hover:text-deep-green">
+                    <i class="fas fa-comment"></i>
+                    <span id="detailComment">0</span>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 pt-4 flex-1">
+                <h4 class="font-medium text-deep-green mb-3">全部评论</h4>
+                <div id="commentWrap" class="flex flex-col gap-4"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ==================== Supabase 配置 ====================
+const SUPABASE_URL = 'https://gjgacyoqpztsozoljsrd.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_LcsFsepI69M19xAvYzMpcA_YCAmjvBl';
+
+let currentParks = [];
+let allParksCache = [];
+let currentPosts = [];
+
+// ==================== 工具函数 ====================
+function getTimeAgo(dateStr) {
+    if (!dateStr) return '刚刚';
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000);
+    if (diff < 60) return '刚刚';
+    if (diff < 3600) return Math.floor(diff / 60) + '分钟前';
+    if (diff < 86400) return Math.floor(diff / 3600) + '小时前';
+    if (diff < 2592000) return Math.floor(diff / 86400) + '天前';
+    return date.toLocaleDateString('zh-CN');
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+// 获取 session
+function getSession() {
+    try {
+        const sessionStr = localStorage.getItem('oasis_session');
+        if (sessionStr) {
+            const session = JSON.parse(sessionStr);
+            const expiresAt = new Date(session.expires_at);
+            if (expiresAt > new Date()) {
+                return session;
+            } else {
+                localStorage.removeItem('oasis_session');
+            }
+        }
+    } catch(e) {}
+    return null;
+}
+
+// ==================== 获取图片质量评分 ====================
+function getImageQualityScore(imageUrl) {
+    if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.startsWith('http')) return 0;
+    let score = 0;
+    const resolutionMatch = imageUrl.match(/_(\d{3,4})_(\d{3,4})_/);
+    if (resolutionMatch) {
+        const width = parseInt(resolutionMatch[1]);
+        if (width >= 2000) score = 100;
+        else if (width >= 1024) score = 90;
+        else if (width >= 640) score = 70;
+        else score = 40;
+    }
+    if (score === 0) {
+        if (imageUrl.includes('store.is.autonavi.com')) score = 55;
+        else if (imageUrl.includes('aos-comment.amap.com')) score = 45;
+        else score = 30;
+    }
+    if (imageUrl.includes('_320_320_') || imageUrl.includes('_480_480_') || 
+        imageUrl.includes('thumb') || imageUrl.includes('small') || imageUrl.includes('160x160')) {
+        score = Math.min(score, 40);
+    }
+    return score;
+}
+
+// ==================== 获取公园数据（使用RPC + 优先推荐逻辑） ====================
+async function loadRandomParks(count = 8) {
+    try {
+        const highQualityParks = [
+            '深圳湾公园观桥公园', '翠湖文体公园', '深圳湾公园日出剧场', '风举公园',
+            '凤凰公园', '深圳湾公园海韵园', '海山公园', '西丽生态公园',
+            '塘朗山公园-无暑平台', '明湖城市公园二期', '奥园·翡翠东湾社区公园', '广东梧桐山国家森林公园',
+            '深圳湾草地公园', '云海公园', '塘朗山公园-极目阁', '深圳人才公园人才星光大道',
+            '粤海体育休闲公园', '海景公园', '深圳中心公园-大草坪', '阳台山森林公园-羊臺山',
+            '四季公园', '明湖公园', '洪田火山公园', '深圳民治体育公园',
+            '阳台山森林公园登山广场', '沙湾关口公园', '文心公园', '北站中心公园樱花园',
+            '石岩环湖碧道石头山公园', '大岭鼓公园', '欢乐港湾-滨海文化公园', '深圳中心公园D2区',
+            '观桥公园-观景平台'
+        ];
+        
+        let parks = [];
+        let firstPark = null;
+        let attempts = 0;
+        const maxAttempts = 3;
+        
+        while (attempts < maxAttempts && !firstPark) {
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_random_parks`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ limit_count: count * 3 })
+            });
+            parks = await response.json();
+            
+            const blacklist = ['消防', '防火', '禁毒', '法治', '法制', '主题公园', '雕塑', '纪念碑', '管理处','管理服务中心','阳台山森林公园','龙胜公园'];
+            parks = parks.filter(park => {
+                const name = park.name || '';
+                if (!name.includes('公园')) return false;
+                for (let word of blacklist) {
+                    if (name.includes(word)) return false;
+                }
+                return true;
+            });
+            
+            for (let hqName of highQualityParks) {
+                const matched = parks.find(park => park.name === hqName);
+                if (matched) {
+                    firstPark = matched;
+                    parks = parks.filter(park => park.id !== matched.id);
+                    break;
+                }
+            }
+            attempts++;
+        }
+        
+        if (!firstPark && parks.length > 0) {
+            firstPark = parks.shift();
+        }
+        
+        parks = parks.map(park => {
+            let photos = [];
+            try { photos = JSON.parse(park.photos || '[]'); } catch(e) {}
+            let maxScore = 0;
+            for (let i = 0; i < Math.min(photos.length, 3); i++) {
+                const imgUrl = photos[i];
+                if (typeof imgUrl === 'string') {
+                    const score = getImageQualityScore(imgUrl);
+                    if (score > maxScore) maxScore = score;
+                }
+            }
+            if (maxScore === 0) maxScore = 20;
+            if (park.rating && parseFloat(park.rating) >= 4.5) maxScore += 15;
+            else if (park.rating && parseFloat(park.rating) >= 4.0) maxScore += 8;
+            return { ...park, imageScore: maxScore };
+        });
+        
+        parks.sort((a, b) => b.imageScore - a.imageScore);
+        if (firstPark) {
+            delete firstPark.imageScore;
+            parks.unshift(firstPark);
+        }
+        parks = parks.slice(0, count).map(park => { delete park.imageScore; return park; });
+        
+        currentParks = parks;
+        renderLeftList(parks);
+        renderRightList(parks);
+        
+        setTimeout(() => {
+            initScrollSync();
+            const rightScroll = document.getElementById('rightScroll');
+            if (rightScroll) rightScroll.style.transform = 'translateY(0px)';
+            
+            // 检查收藏状态
+            document.querySelectorAll('.collect-btn').forEach(async (btn) => {
+                const parkId = btn.dataset.parkId;
+                const isCollected = await checkParkCollected(parkId);
+                if (isCollected) {
+                    btn.textContent = '✅ 已收藏';
+                    btn.classList.add('bg-y2k-cyan/10');
+                }
+            });
+        }, 100);
+        
+        return parks;
+    } catch (error) {
+        console.error('加载失败:', error);
+        return [];
+    }
+}
+
+function renderLeftList(parks) {
+    const leftScroll = document.getElementById('leftScroll');
+    if (!leftScroll) return;
+    if (!parks.length) {
+        leftScroll.innerHTML = '<div class="text-center py-10 text-gray-400">暂无公园数据</div>';
+        return;
+    }
+    leftScroll.innerHTML = '';
+    parks.forEach((park) => {
+        let photos = [];
+        try { photos = JSON.parse(park.photos || '[]'); } catch(e) {}
+        let coverImage = 'https://picsum.photos/400/300?random=' + park.id;
+        if (photos.length > 0 && typeof photos[0] === 'string' && photos[0].startsWith('http')) {
+            coverImage = photos[0];
+        }
+        let tagText = `${park.district || '深圳'} · ${park.keytag || (park.category ? park.category.split(';')[0] : '公园')}`;
+        
+        const card = document.createElement('div');
+        card.className = 'bg-white organic-clip p-5 group shadow-lg park-item cursor-pointer';
+        card.innerHTML = `
+            <div class="aspect-[16/9] overflow-hidden organic-clip mb-4">
+                <img class="w-full h-full object-cover group-hover:scale-105 transition duration-500" 
+                     src="${coverImage}" 
+                     onerror="this.src='https://picsum.photos/400/300?random=${park.id}'">
+            </div>
+            <span class="bg-y2k-cyan/20 text-on-secondary-fixed-variant px-3 py-1 rounded-full text-label-sm">${escapeHtml(tagText)}</span>
+            <h3 class="font-headline-md mt-2">${escapeHtml(park.name)}</h3>
+            <p class="text-on-surface-variant mt-1">${escapeHtml((park.address || '地址待补充').substring(0, 50))}</p>
+        `;
+        card.onclick = () => {
+            window.location.href = `公园详情.html?id=${park.id}`;
+        };
+        leftScroll.appendChild(card);
+    });
+}
+
+function renderRightList(parks) {
+    const rightScroll = document.getElementById('rightScroll');
+    if (!rightScroll) return;
+    if (!parks.length) {
+        rightScroll.innerHTML = '<div class="text-center py-10 text-gray-400">暂无公园数据</div>';
+        return;
+    }
+    let html = '';
+    parks.forEach((park) => {
+        let categoryText = park.keytag || (park.category ? park.category.split(';')[0] : '公园');
+        let addressText = park.address && park.address.trim() && park.address !== '[]' && park.address !== 'null' 
+            ? park.address : '点击详情查看地图';
+        let hoursText = park.opening_hours && park.opening_hours.trim() && park.opening_hours !== '[]' && park.opening_hours !== 'null'
+            ? park.opening_hours : '营业时间待补充';
+        let tagsText = park.keytag || categoryText;
+        let descText = `深圳${park.district ? park.district : ''}的${park.name}，是当地知名的${categoryText}，环境优美，适合休闲放松。`;
+        
+        html += `
+            <div class="bg-white organic-clip p-6 shadow-xl mb-6 detail-card" data-park-id="${park.id}">
+                <span class="bg-tertiary/20 text-tertiary px-3 py-1 rounded-full text-label-sm">当前选中 · ${escapeHtml(park.name)}</span>
+                <h3 class="font-headline-lg mt-3">${escapeHtml(park.name)}</h3>
+                <div class="mt-4 space-y-3 text-body-md text-on-surface-variant">
+                    <p><i class="fas fa-map-marker-alt align-middle text-y2k-cyan fa-icon-sm"></i> ${escapeHtml(addressText)}</p>
+                    <p><i class="fas fa-clock align-middle text-y2k-pink fa-icon-sm"></i> ${escapeHtml(hoursText)}</p>
+                    <p><i class="fas fa-tags align-middle text-tertiary fa-icon-sm"></i> 标签：${escapeHtml(tagsText)}</p>
+                </div>
+                <p class="mt-5 text-on-surface">${escapeHtml(descText)}</p>
+                <div class="mt-6 flex gap-3">
+                    <button onclick="window.location.href='公园详情.html?id=${park.id}'" class="flex-1 bg-y2k-pink text-white py-3 rounded-full hover:scale-105 transition">查看公园详情</button>
+                    <button class="flex-1 border border-y2k-cyan text-y2k-cyan py-3 rounded-full hover:bg-y2k-cyan/5 transition collect-btn" data-park-id="${park.id}">加入我的收藏</button>
+                </div>
+            </div>
+        `;
+    });
+    rightScroll.innerHTML = html;
+    
+    // 绑定收藏按钮事件
+    document.querySelectorAll('.collect-btn').forEach(btn => {
+        btn.addEventListener('click', async function(e) {
+            e.stopPropagation();
+            const parkId = this.dataset.parkId;
+            const success = await collectPark(parkId);
+            if (success) {
+                const isCollected = await checkParkCollected(parkId);
+                if (isCollected) {
+                    this.textContent = '✅ 已收藏';
+                    this.classList.add('bg-y2k-cyan/10');
+                } else {
+                    this.textContent = '加入我的收藏';
+                    this.classList.remove('bg-y2k-cyan/10');
+                }
+            }
+        });
+    });
+}
+
+// 滚动同步
+function initScrollSync() {
+    const left = document.getElementById('leftScroll');
+    const right = document.getElementById('rightScroll');
+    if (!left || !right) return;
+    
+    if (left._scrollHandler) {
+        left.removeEventListener('scroll', left._scrollHandler);
+    }
+    
+    left._scrollHandler = () => {
+        const leftMaxScroll = left.scrollHeight - left.clientHeight;
+        const rightTotalHeight = right.scrollHeight - left.clientHeight;
+        let moveY = 0;
+        if (leftMaxScroll > 0 && rightTotalHeight > 0) {
+            const rate = rightTotalHeight / leftMaxScroll;
+            moveY = left.scrollTop * rate;
+            moveY = Math.min(moveY, rightTotalHeight);
+            moveY = Math.max(moveY, 0);
+        }
+        right.style.transform = `translateY(-${moveY}px)`;
+    };
+    
+    left.addEventListener('scroll', left._scrollHandler);
+    setTimeout(() => { left._scrollHandler(); }, 50);
+}
+
+// ==================== 帖子相关 ====================
+async function loadRandomPosts(count = 3) {
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/posts?select=id,user_id,park_id,title,content,images,likes,comment_count,created_at&order=created_at.desc&limit=30`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`
+            }
+        });
+        
+        if (!response.ok) {
+            console.error('获取帖子失败:', response.status);
+            return [];
+        }
+        
+        let posts = await response.json();
+        console.log('📋 获取到的帖子:', posts);
+        
+        if (!posts || posts.length === 0) {
+            return [];
+        }
+        
+        posts = posts.filter(p => p.content && p.content.trim().length > 0);
+        const shuffled = posts.sort(() => Math.random() - 0.5);
+        const selected = shuffled.slice(0, count);
+        
+        const userIds = [...new Set(selected.map(p => p.user_id).filter(id => id))];
+        let userMap = {};
+        if (userIds.length > 0) {
+            const idsParam = `or=(${userIds.map(id => `id.eq.${id}`).join(',')})`;
+            const profileRes = await fetch(`${SUPABASE_URL}/rest/v1/profiles?${idsParam}&select=id,full_name,avatar_url`, {
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                }
+            });
+            if (profileRes.ok) {
+                const profiles = await profileRes.json();
+                profiles.forEach(p => { userMap[p.id] = p; });
+            }
+        }
+        
+        const result = selected.map(post => {
+            const user = userMap[post.user_id] || {};
+            const images = post.images || [];
+            const coverImage = images.length > 0 ? images[0] : 'https://picsum.photos/seed/' + post.id + '/600/400';
+            const timeAgo = getTimeAgo(post.created_at);
+            
+            return {
+                id: post.id,
+                img: coverImage,
+                images: images,
+                title: post.title || '公园打卡',
+                content: post.content || '',
+                author: user.full_name || '用户',
+                avatar: user.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.full_name || '用户') + '&background=609d7f&color=fff',
+                time: timeAgo,
+                like: post.likes || 0,
+                comment: post.comment_count || 0,
+                user_id: post.user_id,
+                created_at: post.created_at
+            };
+        });
+        
+        currentPosts = result;
+        return result;
+    } catch (error) {
+        console.error('加载帖子错误:', error);
+        return [];
+    }
+}
+
+function renderPosts(posts) {
+    const grid = document.getElementById('postGrid');
+    if (!grid) return;
+    
+    if (!posts || posts.length === 0) {
+        grid.innerHTML = `
+            <div class="col-span-full text-center py-10 text-gray-400">
+                <div class="text-4xl mb-3">📝</div>
+                <p>暂无帖子，去社区分享你的公园体验吧！</p>
+            </div>
+        `;
+        return;
+    }
+    
+    grid.innerHTML = '';
+    posts.forEach((post, index) => {
+        const card = document.createElement('div');
+        card.className = `bg-white organic-clip overflow-hidden shadow-lg post-card ${index === 0 ? 'show' : ''}`;
+        card.setAttribute('data-post-id', post.id);
+        card.innerHTML = `
+            <div class="aspect-[4/3]">
+                <img src="${post.img}" class="w-full h-full object-cover" onerror="this.src='https://picsum.photos/seed/${post.id}/600/400'">
+            </div>
+            <div class="p-5">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-8 h-8 rounded-full overflow-hidden">
+                        <img src="${post.avatar}" class="w-full h-full object-cover" onerror="this.src='https://ui-avatars.com/api/?name=用户&background=609d7f&color=fff'">
+                    </div>
+                    <div>
+                        <div class="font-bold">${escapeHtml(post.author)}</div>
+                        <div class="text-label-sm text-on-surface-variant">${post.time}</div>
+                    </div>
+                </div>
+                <p class="text-body-md line-clamp-2">${escapeHtml(post.content)}</p>
+                <div class="flex justify-between mt-4 pt-3 border-t border-slate-100">
+                    <span class="flex items-center gap-1"><i class="fas fa-heart text-y2k-pink text-sm fa-icon-sm"></i>${post.like}</span>
+                    <span class="flex items-center gap-1"><i class="fas fa-comment text-on-surface-variant text-sm fa-icon-sm"></i>${post.comment}</span>
+                </div>
+            </div>
+        `;
+        card.onclick = () => {
+            openPostDetail(post);
+        };
+        grid.appendChild(card);
+    });
+    
+    setTimeout(() => {
+        document.querySelectorAll('.post-card:not(.show)').forEach((card, i) => {
+            setTimeout(() => card.classList.add('show'), 100 + i * 150);
+        });
+    }, 200);
+}
+
+// ==================== ✅ 打开帖子详情 - 真实数据 ====================
+async function openPostDetail(post) {
+    console.log('打开帖子:', post);
+    
+    const mask = document.getElementById('postDetailMask');
+    const detailImg = document.getElementById('detailImg');
+    const detailAvatar = document.getElementById('detailAvatar');
+    const detailName = document.getElementById('detailName');
+    const detailTitle = document.getElementById('detailTitle');
+    const detailDesc = document.getElementById('detailDesc');
+    const detailLike = document.getElementById('detailLike');
+    const detailCollect = document.getElementById('detailCollect');
+    const detailComment = document.getElementById('detailComment');
+    const tagWrap = document.getElementById('detailTagWrap');
+    const commentWrap = document.getElementById('commentWrap');
+    
+    // 先显示传入的数据
+    detailImg.src = post.img || 'https://picsum.photos/seed/default/600/400';
+    detailAvatar.src = post.avatar || 'https://picsum.photos/id/64/100/100';
+    detailName.innerText = post.author || '用户';
+    detailTitle.innerText = post.title || '公园打卡';
+    detailDesc.innerText = post.content || '';
+    detailLike.innerText = post.like || 0;
+    detailCollect.innerText = post.comment || 0;
+    detailComment.innerText = post.comment || 0;
+    
+    // 标签
+    tagWrap.innerHTML = '';
+    ['#深圳公园', '#户外打卡', '#休闲放松'].forEach(tag => {
+        const span = document.createElement('span');
+        span.className = 'px-2 py-1 bg-light-green/15 text-light-green rounded-full text-sm';
+        span.innerText = tag;
+        tagWrap.appendChild(span);
+    });
+    
+    // 显示加载评论状态
+    commentWrap.innerHTML = `<div class="text-center text-gray-400 text-sm py-4"><i class="fas fa-spinner fa-spin"></i> 加载评论中...</div>`;
+    mask.classList.remove('hidden');
+    
+    // ✅ 从数据库获取真实数据
+    try {
+        const postId = post.id;
+        
+        // 1. 获取点赞数
+        const likeRes = await fetch(`${SUPABASE_URL}/rest/v1/likes?post_id=eq.${postId}&select=id`, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        const likeData = await likeRes.json();
+        detailLike.innerText = likeData ? likeData.length : 0;
+        
+        // 2. 获取收藏数
+        const collectRes = await fetch(`${SUPABASE_URL}/rest/v1/favorites?post_id=eq.${postId}&select=id`, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        const collectData = await collectRes.json();
+        detailCollect.innerText = collectData ? collectData.length : 0;
+        
+        // 3. 获取评论数
+        const commentRes = await fetch(`${SUPABASE_URL}/rest/v1/comments?post_id=eq.${postId}&select=id`, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        const commentData = await commentRes.json();
+        const commentCount = commentData ? commentData.length : 0;
+        detailComment.innerText = commentCount;
+        
+        // 4. 获取评论列表
+        if (commentCount > 0) {
+            const commentsRes = await fetch(`${SUPABASE_URL}/rest/v1/comments?post_id=eq.${postId}&order=created_at.desc&limit=20`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            const comments = await commentsRes.json();
+            
+            // 获取评论用户资料
+            const userIds = [...new Set(comments.map(c => c.user_id).filter(id => id))];
+            let userMap = {};
+            if (userIds.length > 0) {
+                const idsParam = `or=(${userIds.map(id => `id.eq.${id}`).join(',')})`;
+                const profileRes = await fetch(`${SUPABASE_URL}/rest/v1/profiles?${idsParam}&select=id,full_name,avatar_url`, {
+                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                });
+                if (profileRes.ok) {
+                    const profiles = await profileRes.json();
+                    profiles.forEach(p => { userMap[p.id] = p; });
+                }
+            }
+            
+            commentWrap.innerHTML = '';
+            comments.forEach(cm => {
+                const user = userMap[cm.user_id] || {};
+                const name = user.full_name || cm.user_id?.substring(0, 8) || '用户';
+                const avatar = user.avatar_url || 'https://picsum.photos/id/64/80/80';
+                const timeAgo = getTimeAgo(cm.created_at);
+                
+                const commentDiv = document.createElement('div');
+                commentDiv.className = 'flex gap-3';
+                commentDiv.innerHTML = `
+                    <div class="w-8 h-8 rounded-full overflow-hidden shrink-0">
+                        <img src="${avatar}" class="w-full h-full object-cover" onerror="this.src='https://picsum.photos/id/64/80/80'">
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-medium text-gray-700">${escapeHtml(name)}</span>
+                            <span class="text-xs text-gray-400">${timeAgo}</span>
+                        </div>
+                        <div class="text-gray-700 mt-0.5">${escapeHtml(cm.content)}</div>
+                    </div>
+                `;
+                commentWrap.appendChild(commentDiv);
+            });
+        } else {
+            commentWrap.innerHTML = `
+                <div class="text-center text-gray-400 text-sm py-4">
+                    暂无评论，快来抢沙发！
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('获取帖子详情数据失败:', error);
+        // 降级显示
+        commentWrap.innerHTML = `
+            <div class="flex gap-3">
+                <div class="w-8 h-8 rounded-full overflow-hidden shrink-0">
+                    <img src="https://picsum.photos/id/12/80/80" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <div class="text-sm text-gray-500">山野小徐</div>
+                    <div class="text-gray-700 mt-1">风景太美啦，已经收藏！</div>
+                </div>
+            </div>
+            <div class="flex gap-3">
+                <div class="w-8 h-8 rounded-full overflow-hidden shrink-0">
+                    <img src="https://picsum.photos/id/15/80/80" class="w-full h-full object-cover">
+                </div>
+                <div>
+                    <div class="text-sm text-gray-500">深圳徒步君</div>
+                    <div class="text-gray-700 mt-1">请问具体位置在哪，周末想去！</div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+// 关闭弹窗
+document.getElementById('closePostDetail')?.addEventListener('click', () => {
+    document.getElementById('postDetailMask').classList.add('hidden');
+});
+document.getElementById('postDetailMask')?.addEventListener('click', (e) => {
+    if (e.target === e.currentTarget) {
+        document.getElementById('postDetailMask').classList.add('hidden');
+    }
+});
+
+// ==================== 收藏功能 ====================
+async function collectPark(parkId) {
+    const session = getSession();
+    if (!session) {
+        showToast('请先登录再收藏公园', 'error');
+        setTimeout(() => { window.location.href = '个人中心.html'; }, 1000);
+        return false;
+    }
+    
+    try {
+        const checkResponse = await fetch(`${SUPABASE_URL}/rest/v1/favorites?user_id=eq.${session.user.id}&park_id=eq.${parkId}&select=id`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${session.access_token}`
+            }
+        });
+        
+        if (!checkResponse.ok) {
+            console.error('检查收藏失败:', checkResponse.status);
+            showToast('操作失败，请重试', 'error');
+            return false;
+        }
+        
+        const existing = await checkResponse.json();
+        
+        if (existing && existing.length > 0) {
+            const deleteResponse = await fetch(`${SUPABASE_URL}/rest/v1/favorites?id=eq.${existing[0].id}`, {
+                method: 'DELETE',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${session.access_token}`,
+                    'Prefer': 'return=minimal'
+                }
+            });
+            if (deleteResponse.ok) {
+                showToast('已取消收藏', 'success');
+                return true;
+            }
+        } else {
+            const insertResponse = await fetch(`${SUPABASE_URL}/rest/v1/favorites`, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${session.access_token}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({
+                    user_id: session.user.id,
+                    park_id: parkId
+                })
+            });
+            if (insertResponse.ok) {
+                showToast('收藏成功！已添加到"收藏公园"', 'success');
+                return true;
+            }
+        }
+        showToast('操作失败，请重试', 'error');
+        return false;
+    } catch (error) {
+        console.error('收藏错误:', error);
+        showToast('网络错误，请重试', 'error');
+        return false;
+    }
+}
+
+async function checkParkCollected(parkId) {
+    const session = getSession();
+    if (!session) return false;
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/favorites?user_id=eq.${session.user.id}&park_id=eq.${parkId}&select=id`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${session.access_token}`
+            }
+        });
+        if (response.ok) {
+            const data = await response.json();
+            return data && data.length > 0;
+        }
+        return false;
+    } catch (error) {
+        console.error('检查收藏状态失败:', error);
+        return false;
+    }
+}
+
+function showToast(message, type = 'success') {
+    const existing = document.querySelector('.toast-container');
+    if (existing) existing.remove();
+    
+    const container = document.createElement('div');
+    container.className = 'toast-container';
+    
+    const toast = document.createElement('div');
+    toast.className = `toast-message ${type}`;
+    const icon = type === 'success' ? '✅' : '❌';
+    toast.innerHTML = `<span class="toast-icon">${icon}</span><span>${message}</span>`;
+    
+    container.appendChild(toast);
+    document.body.appendChild(container);
+    
+    requestAnimationFrame(() => { toast.classList.add('show'); });
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => { container.remove(); }, 300);
+    }, 2500);
+}
+
+// ==================== 搜索 ====================
+async function loadAllParksForSearch() {
+    if (allParksCache.length > 0) return allParksCache;
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/parks?select=id,name,district&limit=500`, {
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+        });
+        const parks = await response.json();
+        const blacklist = ['消防', '防火', '禁毒', '法治', '法制', '主题公园', '雕塑', '纪念碑', '管理处', '消防文化', '安全文化', '国防教育'];
+        allParksCache = parks.filter(park => {
+            const name = park.name || '';
+            if (!name.includes('公园')) return false;
+            for (let word of blacklist) {
+                if (name.includes(word)) return false;
+            }
+            return true;
+        });
+        return allParksCache;
+    } catch (error) {
+        console.error('加载公园列表失败:', error);
+        return [];
+    }
+}
+
+async function showSuggestions(keyword) {
+    const dropdown = document.getElementById('suggestionsDropdown');
+    if (!keyword.trim() || keyword.trim().length < 1) {
+        dropdown.classList.add('hidden');
+        return;
+    }
+    
+    const allParks = await loadAllParksForSearch();
+    const lowerKeyword = keyword.toLowerCase();
+    let matches = allParks.filter(park => park.name.toLowerCase().includes(lowerKeyword));
+    matches.sort((a, b) => {
+        const aStarts = a.name.toLowerCase().startsWith(lowerKeyword);
+        const bStarts = b.name.toLowerCase().startsWith(lowerKeyword);
+        if (aStarts && !bStarts) return -1;
+        if (!aStarts && bStarts) return 1;
+        return a.name.length - b.name.length;
+    });
+    matches = matches.slice(0, 8);
+    
+    if (matches.length === 0) {
+        dropdown.classList.add('hidden');
+        return;
+    }
+    
+    dropdown.innerHTML = matches.map(park => {
+        const name = park.name;
+        const district = park.district || '深圳';
+        const regex = new RegExp(`(${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        const highlightedName = name.replace(regex, '<span class="search-highlight">$1</span>');
+        return `
+            <div class="search-suggestion-item" data-park-id="${park.id}" data-park-name="${escapeHtml(park.name)}">
+                <div class="font-medium">${highlightedName}</div>
+                <div class="text-xs text-gray-400 mt-0.5">${escapeHtml(district)}</div>
+            </div>
+        `;
+    }).join('');
+    
+    dropdown.classList.remove('hidden');
+    dropdown.querySelectorAll('.search-suggestion-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const parkId = item.getAttribute('data-park-id');
+            document.getElementById('searchInput').value = item.getAttribute('data-park-name');
+            dropdown.classList.add('hidden');
+            window.location.href = `公园详情.html?id=${parkId}`;
+        });
+    });
+}
+
+// ==================== 初始化 ====================
+document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('searchInput');
+    const refreshBtn = document.getElementById('refreshPark');
+    const refreshPostBtn = document.getElementById('refreshPost');
+    const searchBtn = document.getElementById('searchBtn');
+    
+    let debounceTimer;
+    searchInput.addEventListener('input', (e) => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => { showSuggestions(e.target.value); }, 300);
+    });
+    
+    document.addEventListener('click', (e) => {
+        const dropdown = document.getElementById('suggestionsDropdown');
+        const searchContainer = document.querySelector('.search-container');
+        if (dropdown && !searchContainer.contains(e.target)) {
+            dropdown.classList.add('hidden');
+        }
+    });
+    
+    if (searchBtn) {
+        searchBtn.addEventListener('click', () => {
+            document.getElementById('suggestionsDropdown').classList.add('hidden');
+            const keyword = searchInput.value.trim();
+            if (keyword) {
+                alert(`搜索功能：为您找到关于"${keyword}"的公园，请从下拉建议中选择具体公园进入详情页`);
+            }
+        });
+    }
+    
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => { loadRandomParks(8); });
+    }
+    
+    if (refreshPostBtn) {
+        refreshPostBtn.addEventListener('click', async () => {
+            const posts = await loadRandomPosts(3);
+            renderPosts(posts);
+        });
+    }
+    
+    // 初始化加载
+    loadRandomParks(8);
+    loadAllParksForSearch();
+    loadRandomPosts(3).then(posts => renderPosts(posts));
+});
+</script>
+</body>
+</html>

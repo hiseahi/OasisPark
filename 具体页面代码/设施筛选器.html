@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html class="light" lang="zh-Hans">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>设施扭蛋机 | 配套筛选器</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.geekzu.org/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    body {
+      font-family: Georgia, 'Times New Roman', serif;
+      background: linear-gradient(to bottom, #1B3C35 0%, #1B3C35 12%, #f8fbf8 12%, #ffffff 100%);
+      background-attachment: fixed;
+    }
+    .fade-up{opacity:0;transform:translateY(25px);transition:all 0.55s ease-out;}
+    .fade-up.active{opacity:1;transform:translateY(0px);}
+    
+    .quiz-card {
+        background: rgba(255,250,240,0.96);
+        border-radius: 2rem;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(210,170,110,0.3);
+        backdrop-filter: blur(2px);
+        margin-top: 48px; 
+    }
+    .quiz-option {
+        background: white;
+        border-radius: 1.2rem;
+        padding: 0.9rem 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 1px solid #f0e0c8;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        font-size: 0.9rem;
+    }
+    .quiz-option:hover {
+        transform: translateY(-2px);
+        border-color: #ff85c0;
+        background: #FFF9F0;
+        box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+    }
+    .quiz-option.selected {
+        background: #FEF3E2;
+        border-color: #ff85c0;
+        box-shadow: 0 4px 12px rgba(255,133,192,0.2);
+    }
+    .quiz-progress {
+        background: #EADCC8;
+        border-radius: 30px;
+        height: 6px;
+    }
+    .quiz-progress-fill {
+        background: #ff85c0;
+        border-radius: 30px;
+        width: 0%;
+        height: 100%;
+        transition: width 0.3s ease;
+    }
+    
+    .gacha-machine-body {
+        background: linear-gradient(145deg, #E8E8E8, #C8C8C8);
+        border-radius: 70px 70px 45px 45px;
+        box-shadow: 0 20px 35px -8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.8), inset 0 0 0 2px rgba(255,255,255,0.3);
+        border-bottom: 4px solid #A0A0A0;
+        position: relative;
+        overflow: hidden;
+        transform: translateZ(0);
+    }
+    .gacha-machine-body::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: repeating-linear-gradient(90deg, 
+            rgba(0,0,0,0.02) 0px, 
+            rgba(0,0,0,0.02) 2px,
+            transparent 2px,
+            transparent 6px);
+        border-radius: inherit;
+        pointer-events: none;
+    }
+    
+    .gacha-dome {
+        background: transparent;
+        border-radius: 55% 55% 40% 40% / 70% 70% 30% 30%;
+        border: 2px solid rgba(255,255,255,0.6);
+        box-shadow: inset 0 -10px 20px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.2), inset 0 2px 5px rgba(255,255,255,0.3);
+        overflow: visible;
+        position: relative;
+        min-height: 240px;
+        background: radial-gradient(ellipse at 30% 30%, rgba(255,255,255,0.25), transparent 70%);
+    }
+    .gacha-dome::after {
+        content: "";
+        position: absolute;
+        top: 8px;
+        left: 15%;
+        width: 35%;
+        height: 25px;
+        background: linear-gradient(145deg, rgba(255,255,255,0.5), rgba(255,255,255,0));
+        border-radius: 50%;
+        transform: rotate(-10deg);
+        pointer-events: none;
+    }
+    
+    .egg-pool-container {
+        position: relative;
+        min-height: 220px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: transparent;
+    }
+    .egg-pool {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: flex-end;
+        gap: 10px;
+        padding: 20px 15px;
+        background: transparent;
+        position: relative;
+        z-index: 5;
+    }
+    .pool-egg {
+        width: 45px;
+        height: 58px;
+        border-radius: 50% 50% 45% 45%;
+        box-shadow: 0 3px 5px rgba(0,0,0,0.2), inset 0 1px 2px rgba(255,255,255,0.4);
+        position: relative;
+        cursor: pointer;
+        transition: all 0.1s ease;
+    }
+    .pool-egg::before {
+        content: "";
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        width: 12px;
+        height: 12px;
+        background: radial-gradient(circle, rgba(255,255,255,0.7), rgba(255,255,255,0));
+        border-radius: 50%;
+    }
+    
+    @keyframes allEggsShake {
+        0% { transform: translate(0px, 0px) rotate(0deg); }
+        15% { transform: translate(-4px, -3px) rotate(-3deg); }
+        30% { transform: translate(3px, -5px) rotate(3deg); }
+        45% { transform: translate(-3px, 4px) rotate(-2deg); }
+        60% { transform: translate(5px, 2px) rotate(4deg); }
+        75% { transform: translate(-2px, -2px) rotate(-3deg); }
+        90% { transform: translate(3px, -4px) rotate(2deg); }
+        100% { transform: translate(0px, 0px) rotate(0deg); }
+    }
+    .egg-pool.shaking .pool-egg {
+        animation: allEggsShake 0.15s infinite;
+    }
+    
+    .falling-egg {
+        position: fixed;
+        width: 45px;
+        height: 58px;
+        border-radius: 50% 50% 45% 45%;
+        z-index: 200;
+        pointer-events: none;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.4);
+        transition: all 0.02s linear;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+    
+    .particle-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 250;
+    }
+    .particle {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        pointer-events: none;
+        animation: particleExplode 0.8s ease-out forwards;
+    }
+    @keyframes particleExplode {
+        0% { transform: translate(0, 0) scale(1); opacity: 1; }
+        100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
+    }
+    
+    #confettiCanvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 300;
+    }
+    
+    .display-screen {
+        background: linear-gradient(145deg, #1a3a30, #0a1f18);
+        box-shadow: inset 0 0 15px rgba(0,0,0,0.6), 0 5px 15px rgba(0,0,0,0.3), inset 0 0 0 2px rgba(255,255,255,0.1);
+        border-radius: 1.2rem;
+        border: 1px solid #2a4a3e;
+    }
+    .display-inner {
+        background: rgba(0,0,0,0.4);
+        border-radius: 0.8rem;
+        min-height: 85px;
+        transition: background-color 0.2s ease;
+        box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+    }
+    
+    .status-led {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #333;
+        transition: all 0.1s ease;
+        box-shadow: inset 0 1px 2px rgba(0,0,0,0.3);
+    }
+    .status-led.on {
+        background: #00ff88;
+        box-shadow: 0 0 10px #00ff88, inset 0 1px 2px rgba(255,255,255,0.3);
+    }
+    .status-led.blink {
+        animation: ledBlink 0.2s ease-in-out infinite;
+    }
+    @keyframes ledBlink {
+        0%, 100% { opacity: 1; background: #ff85c0; box-shadow: 0 0 10px #ff85c0; }
+        50% { opacity: 0.4; background: #ff4d8c; box-shadow: 0 0 3px #ff4d8c; }
+    }
+    
+    .led-strip {
+        height: 3px;
+        background: linear-gradient(90deg, #ff85c0, #00f5ff, #ff85c0);
+        border-radius: 2px;
+        animation: stripFlow 2s linear infinite;
+        background-size: 200% 100%;
+    }
+    @keyframes stripFlow {
+        0% { background-position: 0% 0%; }
+        100% { background-position: 100% 0%; }
+    }
+    
+    .gacha-action-btn {
+        background: #ff85c0;
+        border: none;
+        border-radius: 3rem;
+        padding: 0;
+        cursor: pointer;
+        box-shadow: 0 6px 0 #b84c7a, 0 0 0 2px rgba(255,255,255,0.3), inset 0 1px 0 rgba(255,255,255,0.5);
+        transition: all 0.05s linear;
+    }
+    .gacha-action-btn:active {
+        transform: translateY(4px);
+        box-shadow: 0 2px 0 #b84c7a, 0 0 0 2px rgba(255,255,255,0.3);
+    }
+    .gacha-action-btn.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+    .btn-inner {
+        background: linear-gradient(145deg, #ff9dcc, #ff6ba8);
+        border-radius: 3rem;
+        padding: 0.7rem 1.5rem;
+        font-weight: bold;
+        font-size: 1rem;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-shadow: 0 1px 0 rgba(0,0,0,0.2);
+    }
+    
+    .deco-lever {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .lever-stick {
+        width: 8px;
+        height: 35px;
+        background: linear-gradient(145deg, #d0d0d0, #a0a0a0);
+        border-radius: 4px;
+        box-shadow: inset -1px -1px 0 #888, inset 1px 1px 0 #eee;
+    }
+    .lever-ball {
+        width: 30px;
+        height: 30px;
+        background: radial-gradient(circle at 35% 35%, #ff5555, #aa0000);
+        border-radius: 50%;
+        margin-top: -5px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3), inset 0 1px 2px rgba(255,255,255,0.4);
+        position: relative;
+    }
+    .lever-ball::before {
+        content: "";
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background: rgba(255,255,255,0.4);
+        border-radius: 50%;
+        top: 5px;
+        left: 6px;
+    }
+    
+    .egg-exit {
+        margin-top: 0.8rem;
+        position: relative;
+    }
+    .exit-hole {
+        width: 50px;
+        height: 22px;
+        background: #1a1a1a;
+        border-radius: 0 0 25px 25px;
+        margin: 0 auto;
+        box-shadow: inset 0 5px 8px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.2);
+    }
+    .exit-tray {
+        width: 90px;
+        height: 14px;
+        background: linear-gradient(145deg, #c0c0c0, #a0a0a0);
+        border-radius: 10px;
+        margin: 5px auto 0;
+        position: relative;
+        box-shadow: inset 0 1px 2px rgba(255,255,255,0.5), 0 2px 5px rgba(0,0,0,0.2);
+    }
+    
+    .screw {
+        width: 8px;
+        height: 8px;
+        background: radial-gradient(circle, #aaa, #666);
+        border-radius: 50%;
+        box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2);
+        position: relative;
+    }
+    .screw::before {
+        content: "•";
+        position: absolute;
+        font-size: 7px;
+        color: #333;
+        left: 1.5px;
+        top: -2px;
+    }
+    
+    .result-area {
+        opacity: 0;
+        transform: scale(0.9);
+        transition: all 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
+    }
+    .result-area.show {
+        opacity: 1;
+        transform: scale(1);
+    }
+    
+    .capsule-icon {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(145deg, #ff85c0, #e05a9e);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 36px;
+        margin: 0 auto 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        animation: capsuleFloat 2s ease-in-out infinite;
+    }
+    @keyframes capsuleFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
+    
+    .rec-card {
+        transition: all 0.2s ease;
+        cursor: pointer;
+        opacity: 0;
+        transform: translateY(30px);
+        animation: cardFlyIn 0.4s ease-out forwards;
+    }
+    .rec-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 25px -8px rgba(0,0,0,0.15);
+    }
+    @keyframes cardFlyIn {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .egg-count-badge {
+        background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(8px);
+        border-radius: 30px;
+        padding: 3px 10px;
+        border: 1px solid rgba(255,255,255,0.3);
+        display: inline-block;
+    }
+    
+    .pool-egg:nth-child(1) { background: radial-gradient(circle at 35% 30%, #FF85C0, #E05A9E); }
+    .pool-egg:nth-child(2) { background: radial-gradient(circle at 35% 30%, #00F5FF, #00B8CC); }
+    .pool-egg:nth-child(3) { background: radial-gradient(circle at 35% 30%, #A8E6CF, #6BBF8A); }
+    .pool-egg:nth-child(4) { background: radial-gradient(circle at 35% 30%, #FFD93D, #E5C200); }
+    .pool-egg:nth-child(5) { background: radial-gradient(circle at 35% 30%, #C084FC, #9333EA); }
+    .pool-egg:nth-child(6) { background: radial-gradient(circle at 35% 30%, #FB923C, #EA580C); }
+    .pool-egg:nth-child(7) { background: radial-gradient(circle at 35% 30%, #34D399, #059669); }
+    .pool-egg:nth-child(8) { background: radial-gradient(circle at 35% 30%, #60A5FA, #2563EB); }
+    .pool-egg:nth-child(9) { background: radial-gradient(circle at 35% 30%, #F472B6, #DB2777); }
+    .pool-egg:nth-child(10) { background: radial-gradient(circle at 35% 30%, #2DD4BF, #0D9488); }
+    
+    #resultArea { display: none; }
+    #resultArea.show { display: block !important; }
+</style>
+<script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: { "y2k-pink": "#ff85c0", "y2k-cyan": "#00f5ff", "deep-green":"#1B3C35", "light-green":"#609d7f" },
+          borderRadius: {"DEFAULT": "1rem","lg": "2rem","xl": "3rem","full": "9999px"},
+          spacing: {"container-padding": "24px","unit": "8px","gutter": "16px","section-gap": "48px"},
+          fontFamily: {"serif": ["Georgia", "Times New Roman", "serif"],"plus-jakarta": ["Plus Jakarta Sans", "sans-serif"]},
+        }
+      }
+    }
+</script>
+</head>
+<body class="text-gray-800">
+
+<nav class="flex justify-between items-center px-container-padding w-full" style="background-color: transparent; border-bottom: none; padding: 16px 24px; position: fixed; top: 0; left: 0; right: 0; z-index: 50;">
+<div class="text-[48px] font-black text-y2k-pink drop-shadow-sm">oasis</div>
+<div class="hidden md:flex items-center rounded-full mx-auto px-8 gap-20 py-1 bg-white/80 backdrop-blur-lg border border-black/10 shadow-lg min-w-[700px] justify-center">
+    <a class="text-y2k-pink font-semibold px-4 py-2 rounded-[20px] hover:bg-y2k-pink hover:text-white transition-all" href="index.html">首页</a>
+    <a class="text-y2k-pink font-semibold px-4 py-2 rounded-[20px] hover:bg-y2k-pink hover:text-white transition-all" href="探索.html">探索</a>
+    <a class="bg-y2k-pink text-white font-semibold px-4 py-2 rounded-[20px]" href="寻找公园.html">寻找公园</a>
+    <a class="text-y2k-pink font-semibold px-4 py-2 rounded-[20px] hover:bg-y2k-pink hover:text-white transition-all" href="社区.html">社区</a>
+    <a class="text-y2k-pink font-semibold px-4 py-2 rounded-[20px] hover:bg-y2k-pink hover:text-white transition-all" href="我的足迹.html">我的足迹</a>
+</div>
+<div class="flex items-center gap-4">
+<button onclick="alert('探索自然')" class="bg-y2k-pink text-white px-6 py-2 rounded-full shadow-lg shadow-y2k-pink/20 hover:scale-105 transition-transform"onclick="window.location.href='个人中心.html'">个人中心</button>
+</div>
+</nav>
+
+<main class="pt-32 px-container-padding max-w-6xl mx-auto py-12">
+    <div class="text-center mb-10 fade-up">
+        <h2 class="text-[32px] font-bold text-deep-green mb-2">设施扭蛋机</h2>
+        <p class="text-gray-500">选择你需要的设施配套，摇出理想公园</p>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-8 fade-up">
+        <div class="lg:w-3/5">
+            <div class="gacha-machine-body p-4">
+                <div class="gacha-dome rounded-t-[55px] pt-4">
+                    <div class="egg-pool-container">
+                        <div class="egg-pool" id="eggPool">
+                            <div class="pool-egg"></div><div class="pool-egg"></div><div class="pool-egg"></div>
+                            <div class="pool-egg"></div><div class="pool-egg"></div><div class="pool-egg"></div>
+                            <div class="pool-egg"></div><div class="pool-egg"></div><div class="pool-egg"></div>
+                            <div class="pool-egg"></div>
+                        </div>
+                    </div>
+                    <div class="text-center pb-3">
+                        <div class="egg-count-badge">
+                            <span class="text-white font-bold text-sm" id="eggPoolCount">0</span>
+                            <span class="text-white/70 text-xs">个公园待扭</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gradient-to-b from-gray-200 to-gray-300 rounded-b-[45px] p-3 mt-1">
+                    <div class="led-strip w-full mb-2"></div>
+                    <div class="display-screen rounded-xl p-2 mb-3">
+                        <div class="display-inner rounded-lg p-2 text-center" id="displayScreen">
+                            <div class="text-2xl mb-1">🏟️</div>
+                            <div class="text-white font-bold text-xs" id="displayTitle">设施扭蛋机</div>
+                            <div class="text-white/50 text-[10px] mt-1" id="displaySub">选择需要的设施即可扭蛋</div>
+                        </div>
+                        <div class="flex justify-center gap-2 mt-2">
+                            <div class="status-led" id="led1"></div>
+                            <div class="status-led" id="led2"></div>
+                            <div class="status-led" id="led3"></div>
+                        </div>
+                    </div>
+                    <div class="bg-gradient-to-b from-gray-300 to-gray-400 rounded-xl p-3 shadow-inner">
+                        <div class="flex justify-between items-center">
+                            <button id="gachaBtn" class="gacha-action-btn disabled opacity-50 cursor-not-allowed">
+                                <div class="btn-inner"><span>🎰</span><span>扭蛋！</span></div>
+                            </button>
+                            <div class="deco-lever"><div class="lever-stick"></div><div class="lever-ball"></div></div>
+                        </div>
+                        <div class="egg-exit mt-2"><div class="exit-hole"></div><div class="exit-tray" id="eggExitTray"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="lg:w-2/5">
+            <div class="quiz-card p-5 shadow-xl" id="quizContainer"></div>
+        </div>
+    </div>
+
+    <div id="resultArea" class="hidden mt-10">
+        <div class="capsule-icon">🎁</div>
+        <h3 class="text-center text-deep-green text-xl font-bold mb-6" id="resultTitle"></h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="resultGrid"></div>
+        <div class="text-center mt-8">
+            <button id="restartGachaBtn" class="px-6 py-2 border-2 border-y2k-pink text-y2k-pink rounded-full hover:bg-y2k-pink hover:text-white transition-all">再扭一次</button>
+        </div>
+    </div>
+    
+    <div id="particleContainer" class="particle-container"></div>
+    <canvas id="confettiCanvas"></canvas>
+</main>
+
+<footer class="w-full py-12 px-container-padding flex flex-col md:flex-row justify-between items-center gap-8 bg-white/10 backdrop-blur-md rounded-t-[4rem] mt-12">
+<p class="text-sm text-gray-500">© 2026 深圳绿洲(Shenzhen Oasis). 重拾城市宁静 | 地图数据 © 高德地图</p></div>
+<div class="flex gap-8"><a class="text-gray-500 hover:text-y2k-cyan transition-colors text-sm" href="#">关于我们</a><a class="text-gray-500 hover:text-y2k-cyan transition-colors text-sm" href="#">游园指南</a><a class="text-gray-500 hover:text-y2k-cyan transition-colors text-sm" href="#">隐私政策</a><a class="text-gray-500 hover:text-y2k-cyan transition-colors text-sm">联系我们</a></div>
+<div class="flex gap-4"><div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-gray-600 hover:text-y2k-cyan"><i class="fas fa-share-alt"></i></div><div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-gray-600 hover:text-y2k-cyan"><i class="fas fa-globe"></i></div></div>
+</footer>
+
+<script>
+// ==================== Supabase 配置 ====================
+const SUPABASE_URL = 'https://gjgacyoqpztsozoljsrd.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_LcsFsepI69M19xAvYzMpcA_YCAmjvBl';
+
+let parkList = [];
+let isDataLoaded = false;
+
+// ==================== 从数据库加载公园数据 ====================
+async function loadParksFromDB() {
+    try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/parks?select=name,district,facilities,photos,atmosphere_desc`, {
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`
+            }
+        });
+        
+        const parks = await response.json();
+        console.log('从数据库加载的公园数量:', parks.length);
+        
+        const validParks = parks.filter(p => p.facilities && Array.isArray(p.facilities) && p.facilities.length > 0);
+        console.log('有设施数据的公园数量:', validParks.length);
+        
+        parkList = validParks.map(p => {
+            let photos = [];
+            try {
+                photos = JSON.parse(p.photos || '[]');
+            } catch(e) {
+                photos = [];
+            }
+            const img = (photos.length > 0 && typeof photos[0] === 'string' && photos[0].startsWith('http')) 
+                ? photos[0] 
+                : 'https://picsum.photos/seed/' + encodeURIComponent(p.name) + '/600/400';
+            
+            return {
+                name: p.name || '公园',
+                area: p.district || '深圳',
+                tags: p.facilities || [],
+                img: img,
+                desc: p.atmosphere_desc || '环境优美，适合休闲放松'
+            };
+        });
+        
+        console.log('最终有效公园数量:', parkList.length);
+        isDataLoaded = true;
+        
+        renderQuiz();
+        updateEggPoolCount(0);
+        
+        if (parkList.length === 0) {
+            document.getElementById('quizContainer').innerHTML = `
+                <div class="text-center py-10">
+                    <div class="text-4xl mb-3">⚠️</div>
+                    <p class="text-gray-500">暂无设施数据，请先在数据库中添加 facilities 字段</p>
+                </div>
+            `;
+        }
+        
+    } catch (error) {
+        console.error('加载公园数据失败:', error);
+        document.getElementById('quizContainer').innerHTML = `
+            <div class="text-center py-10">
+                <div class="text-4xl mb-3">⚠️</div>
+                <p class="text-gray-500">数据加载失败，请刷新重试</p>
+                <button onclick="location.reload()" class="mt-3 px-4 py-2 bg-light-green text-white rounded-full">刷新</button>
+            </div>
+        `;
+    }
+}
+
+const questions = [
+    { 
+        text: "你常用的公园设施是？", 
+        options: [
+            { label: "🏃 跑步/骑行道", tag: "跑道" }, 
+            { label: "🌿 大草坪/休息区", tag: "大草坪" },
+            { label: "🏔️ 登山/徒步道", tag: "登山道" }, 
+            { label: "🚻 卫生间", tag: "卫生间" }
+        ]
+    },
+    { 
+        text: "你希望公园有哪些附加配套？", 
+        options: [
+            { label: "🎠 儿童游乐区", tag: "儿童游乐区" }, 
+            { label: "🅿️ 停车场", tag: "停车场" },
+            { label: "🌅 观景台/打卡点", tag: "观景台" }, 
+            { label: "🚴 骑行绿道", tag: "骑行道" }
+        ]
+    }
+];
+
+let userSelectedTags = { page1: [], page2: [] };
+let currentPage = 1;
+let isGachaAnimating = false;
+
+// DOM 元素
+const quizContainer = document.getElementById('quizContainer');
+const led1 = document.getElementById('led1'), led2 = document.getElementById('led2'), led3 = document.getElementById('led3');
+const displayTitle = document.getElementById('displayTitle'), displaySub = document.getElementById('displaySub');
+const gachaBtn = document.getElementById('gachaBtn');
+const resultArea = document.getElementById('resultArea'), resultGrid = document.getElementById('resultGrid'), resultTitle = document.getElementById('resultTitle');
+const restartGachaBtn = document.getElementById('restartGachaBtn');
+const eggPoolCountSpan = document.getElementById('eggPoolCount'), eggPoolDiv = document.getElementById('eggPool');
+const particleContainer = document.getElementById('particleContainer'), confettiCanvas = document.getElementById('confettiCanvas');
+
+function updateEggPoolCount(count) { eggPoolCountSpan.innerText = count; }
+function updateDisplay(title, sub, isSelected = false) {
+    displayTitle.innerText = title;
+    displaySub.innerText = sub;
+    const di = document.querySelector('.display-inner');
+    di.style.backgroundColor = isSelected ? 'rgba(0,255,136,0.1)' : 'rgba(0,0,0,0.4)';
+}
+function setLeds(state) {
+    if (state === 'off') [led1, led2, led3].forEach(l => l.classList.remove('on', 'blink'));
+    else if (state === 'on') [led1, led2, led3].forEach(l => { l.classList.remove('blink'); l.classList.add('on'); });
+    else if (state === 'blink') [led1, led2, led3].forEach(l => { l.classList.remove('on'); l.classList.add('blink'); });
+}
+function setButtonEnabled(enabled) {
+    const allDone = userSelectedTags.page1.length > 0 && userSelectedTags.page2.length > 0;
+    if (enabled && allDone && !isGachaAnimating && isDataLoaded) gachaBtn.classList.remove('disabled', 'opacity-50', 'cursor-not-allowed');
+    else gachaBtn.classList.add('disabled', 'opacity-50', 'cursor-not-allowed');
+}
+function shakeAllEggs() { eggPoolDiv.classList.add('shaking'); }
+function stopShakingEggs() { eggPoolDiv.classList.remove('shaking'); }
+
+function createParticles(x, y) {
+    const colors = ['#ff85c0', '#00f5ff', '#ffd93d', '#a8e6cf', '#c084fc', '#fb923c'];
+    for (let i = 0; i < 80; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        p.style.left = x + 'px';
+        p.style.top = y + 'px';
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 50 + Math.random() * 130;
+        p.style.setProperty('--x', Math.cos(angle) * dist + 'px');
+        p.style.setProperty('--y', Math.sin(angle) * dist + 'px');
+        particleContainer.appendChild(p);
+        setTimeout(() => p.remove(), 800);
+    }
+}
+
+function startConfetti() {
+    confettiCanvas.style.display = 'block';
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+    const ctx = confettiCanvas.getContext('2d');
+    let particles = [];
+    const colors = ['#ff85c0', '#00f5ff', '#ffd93d', '#a8e6cf', '#c084fc', '#fb923c', '#f472b6', '#2dd4bf'];
+    for (let i = 0; i < 350; i++) {
+        particles.push({
+            x: Math.random() * confettiCanvas.width,
+            y: Math.random() * confettiCanvas.height * 0.3,
+            vx: (Math.random() - 0.5) * 9,
+            vy: Math.random() * 7 + 3,
+            size: Math.random() * 14 + 4,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            rotation: Math.random() * 360,
+            rotSpeed: (Math.random() - 0.5) * 15
+        });
+    }
+    let animId, start = Date.now();
+    function animate() {
+        ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+        let alive = false;
+        for (let p of particles) {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.18;
+            p.rotation += p.rotSpeed;
+            if (p.y < confettiCanvas.height + 100) {
+                alive = true;
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, 1 - (Date.now() - start) / 3800);
+                ctx.translate(p.x, p.y);
+                ctx.rotate(p.rotation * Math.PI / 180);
+                ctx.fillStyle = p.color;
+                ctx.fillRect(-p.size/2, -p.size/2, p.size/2.5, p.size);
+                ctx.restore();
+            }
+        }
+        if (!alive || Date.now() - start > 4200) {
+            cancelAnimationFrame(animId);
+            ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+            confettiCanvas.style.display = 'none';
+        } else animId = requestAnimationFrame(animate);
+    }
+    animate();
+}
+
+function dropEggAndExplode(targetEgg, callback) {
+    const rect = targetEgg.getBoundingClientRect();
+    const startX = rect.left + rect.width/2, startY = rect.top + rect.height/2;
+    targetEgg.style.opacity = '0';
+    targetEgg.style.visibility = 'hidden';
+    const falling = document.createElement('div');
+    falling.className = 'falling-egg';
+    falling.style.background = getComputedStyle(targetEgg).background;
+    falling.style.left = startX + 'px';
+    falling.style.top = startY + 'px';
+    falling.style.transform = 'translate(-50%, -50%)';
+    falling.innerHTML = '🥚';
+    document.body.appendChild(falling);
+    const targetY = window.innerHeight - 170;
+    const startTime = performance.now();
+    function drop(now) {
+        let t = Math.min(1, (now - startTime) / 500);
+        let ease = 1 - Math.pow(1 - t, 2);
+        let curY = startY + (targetY - startY) * ease;
+        let rot = t * 600;
+        falling.style.left = startX + 'px';
+        falling.style.top = curY + 'px';
+        falling.style.transform = `translate(-50%, -50%) rotate(${rot}deg)`;
+        if (t < 1) requestAnimationFrame(drop);
+        else {
+            createParticles(startX, targetY);
+            startConfetti();
+            falling.remove();
+            targetEgg.style.opacity = '1';
+            targetEgg.style.visibility = 'visible';
+            if (callback) callback();
+        }
+    }
+    requestAnimationFrame(drop);
+}
+
+// ==================== 已显示公园记录 ====================
+let displayedParkIds = [];
+let totalDisplayedCount = 0;
+
+function getMatchedParks() {
+    if (!isDataLoaded || parkList.length === 0) return [];
+    const allTags = [...userSelectedTags.page1, ...userSelectedTags.page2];
+    if (allTags.length === 0) return parkList.slice(0, 6);
+    
+    // 1. 先找出所有匹配的公园（按匹配度排序）
+    const scored = parkList.map(park => {
+        const parkTags = park.tags || [];
+        let matchCount = 0;
+        allTags.forEach(userTag => {
+            parkTags.forEach(parkTag => {
+                if (parkTag.includes(userTag) || userTag.includes(parkTag)) {
+                    matchCount++;
+                }
+            });
+        });
+        return {
+            ...park,
+            matchScore: matchCount,
+            // 如果已经显示过，降低权重（加一个惩罚分）
+            displayedPenalty: displayedParkIds.includes(park.name) ? -10 : 0,
+            // 随机因子（让结果有变化）
+            randomFactor: Math.random() * 3
+        };
+    });
+    
+    // 2. 按综合得分排序（匹配度 + 随机因子 - 已显示惩罚）
+    const sorted = scored.sort((a, b) => {
+        const scoreA = a.matchScore + a.randomFactor + a.displayedPenalty;
+        const scoreB = b.matchScore + b.randomFactor + b.displayedPenalty;
+        return scoreB - scoreA;
+    });
+    
+    // 3. 取前6个（尽量选未显示过的）
+    let results = sorted.filter(p => p.matchScore > 0);
+    
+    // 如果匹配结果少于6个，从所有公园中补充
+    if (results.length < 6) {
+        const remaining = parkList.filter(p => !results.includes(p));
+        const shuffled = remaining.sort(() => Math.random() - 0.5);
+        results = [...results, ...shuffled.slice(0, 6 - results.length)];
+    }
+    
+    // 4. 取前6个
+    const selected = results.slice(0, 6);
+    
+    // 5. 记录已显示的公园
+    selected.forEach(p => {
+        if (!displayedParkIds.includes(p.name)) {
+            displayedParkIds.push(p.name);
+        }
+    });
+    totalDisplayedCount += selected.length;
+    
+    // 6. 如果已显示的公园超过总公园的 80%，重置列表（给用户新鲜感）
+    if (displayedParkIds.length > parkList.length * 0.8) {
+        console.log('🔄 已显示大部分公园，重置列表');
+        displayedParkIds = [];
+    }
+    
+    console.log(`📊 已显示 ${displayedParkIds.length}/${parkList.length} 个不同公园`);
+    return selected;
+}
+function showResultsWithAnimation(parks) {
+    resultTitle.innerText = '✨ 根据你的设施偏好 · 为你推荐 ✨';
+    resultGrid.innerHTML = '';
+    const limited = parks.slice(0, 6);
+    limited.forEach((p, i) => {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-2xl overflow-hidden shadow-lg rec-card flex flex-col';
+        card.style.animationDelay = `${i * 0.1}s`;
+        card.innerHTML = `
+            <div class="h-40 overflow-hidden flex-shrink-0">
+                <img src="${p.img}" class="w-full h-full object-cover" onerror="this.src='https://picsum.photos/seed/${p.name}/600/400'">
+            </div>
+            <div class="p-4 flex flex-col flex-1">
+                <h4 class="font-bold text-deep-green text-lg">${p.name}</h4>
+                <p class="text-gray-500 text-xs mb-2">📍 ${p.area}</p>
+                <p class="text-gray-600 text-sm flex-1">${p.desc}</p>
+                <div class="flex flex-wrap gap-1 mt-2 flex-shrink-0">${p.tags.map(t => `<span class="px-2 py-0.5 bg-light-green/15 text-light-green rounded-full text-xs">🏷️ ${t}</span>`).join('')}</div>
+            </div>
+        `;
+        resultGrid.appendChild(card);
+    });
+    resultArea.classList.remove('hidden');
+    resultArea.classList.add('show');
+    setTimeout(() => resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+}
+
+function performGacha() {
+    if (isGachaAnimating || !isDataLoaded) return;
+    const allDone = userSelectedTags.page1.length > 0 && userSelectedTags.page2.length > 0;
+    if (!allDone) { updateDisplay('⚠️ 请先选择设施偏好', '完成两页选择即可扭蛋', false); return; }
+    const matched = getMatchedParks();
+    if (!matched.length) { updateDisplay('⚠️ 无匹配公园', '试试重新选择', false); return; }
+    updateEggPoolCount(matched.length);
+    isGachaAnimating = true;
+    setButtonEnabled(false);
+    updateDisplay('🎲 扭蛋中...', '蛋池摇晃，掉落惊喜', false);
+    setLeds('blink');
+    shakeAllEggs();
+    setTimeout(() => {
+        stopShakingEggs();
+        const eggs = document.querySelectorAll('.pool-egg');
+        const target = eggs[Math.floor(Math.random() * eggs.length)];
+        dropEggAndExplode(target, () => {
+            updateDisplay('🎉 匹配成功！', `发现 ${matched.length} 个推荐公园`, true);
+            setLeds('on');
+            showResultsWithAnimation(matched);
+            isGachaAnimating = false;
+            setButtonEnabled(true);
+        });
+    }, 600);
+}
+
+function renderQuiz() {
+    if (!isDataLoaded || parkList.length === 0) {
+        quizContainer.innerHTML = `
+            <div class="text-center py-10">
+                <div class="text-4xl mb-3">🔄</div>
+                <p class="text-gray-500">加载公园数据中...</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const pageData = questions[currentPage - 1];
+    quizContainer.innerHTML = `
+        <div class="mb-4 text-center"><i class="fa-solid fa-building text-y2k-pink text-xl"></i><h3 class="font-bold text-deep-green text-lg mt-1">设施探测器</h3><p class="text-xs text-gray-500">${pageData.text}</p></div>
+        <div class="quiz-progress mb-5"><div class="quiz-progress-fill" style="width: ${currentPage / questions.length * 100}%"></div></div>
+        <div class="text-center text-sm text-gray-500 mb-4">第 ${currentPage}/${questions.length} 页</div>
+        <div class="space-y-3 mb-6">
+            ${pageData.options.map(opt => {
+                const isSel = (currentPage === 1 && userSelectedTags.page1.includes(opt.tag)) || (currentPage === 2 && userSelectedTags.page2.includes(opt.tag));
+                return `<div class="quiz-option ${isSel ? 'selected' : ''}" data-tag="${opt.tag}" data-page="${currentPage}"><i class="fa-regular ${isSel ? 'fa-square-check' : 'fa-square'} mr-2 text-y2k-pink"></i> ${opt.label}</div>`;
+            }).join('')}
+        </div>
+        <div class="flex justify-between gap-4">
+            ${currentPage > 1 ? '<button id="prevPageBtn" class="px-4 py-2 border border-gray-300 rounded-full text-gray-600 hover:bg-gray-100">上一页</button>' : '<div></div>'}
+            ${currentPage < questions.length ? '<button id="nextPageBtn" class="px-4 py-2 bg-y2k-pink text-white rounded-full hover:bg-pink-600">下一页</button>' : 
+                `<button id="confirmBtn" class="px-4 py-2 bg-y2k-pink text-white rounded-full hover:bg-pink-600">完成选择</button>`}
+        </div>
+        <div class="text-center text-xs text-gray-400 mt-4">✨ 完成两页选择后，扭蛋机指示灯亮起 ✨</div>
+    `;
+    
+    document.querySelectorAll('.quiz-option').forEach(opt => {
+        opt.onclick = () => {
+            const tag = opt.dataset.tag, page = parseInt(opt.dataset.page);
+            if (opt.classList.contains('selected')) {
+                opt.classList.remove('selected');
+                opt.querySelector('i').classList.replace('fa-square-check', 'fa-square');
+                if (page === 1) userSelectedTags.page1 = userSelectedTags.page1.filter(t => t !== tag);
+                else userSelectedTags.page2 = userSelectedTags.page2.filter(t => t !== tag);
+            } else {
+                opt.classList.add('selected');
+                opt.querySelector('i').classList.replace('fa-square', 'fa-square-check');
+                if (page === 1 && !userSelectedTags.page1.includes(tag)) userSelectedTags.page1.push(tag);
+                else if (page === 2 && !userSelectedTags.page2.includes(tag)) userSelectedTags.page2.push(tag);
+            }
+            const allDone = userSelectedTags.page1.length > 0 && userSelectedTags.page2.length > 0;
+            if (allDone) {
+                const matched = getMatchedParks();
+                updateEggPoolCount(matched.length);
+                updateDisplay('选择完成！', '可以开始扭蛋啦', true);
+                setLeds('on');
+                setButtonEnabled(true);
+            } else {
+                setLeds('off');
+                setButtonEnabled(false);
+                updateEggPoolCount(0);
+                updateDisplay('继续选择', `${userSelectedTags.page1.length>0?'✓第一页完成':'未完成第一页'}`, false);
+            }
+        };
+    });
+    
+    document.getElementById('prevPageBtn')?.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderQuiz(); } });
+    document.getElementById('nextPageBtn')?.addEventListener('click', () => { if (currentPage < questions.length && userSelectedTags.page1.length > 0) { currentPage++; renderQuiz(); } });
+    document.getElementById('confirmBtn')?.addEventListener('click', () => {
+        const allDone = userSelectedTags.page1.length > 0 && userSelectedTags.page2.length > 0;
+        if (allDone) {
+            const matched = getMatchedParks();
+            updateEggPoolCount(matched.length);
+            updateDisplay('选择完成！', '可以开始扭蛋啦', true);
+            setLeds('on');
+            setButtonEnabled(true);
+        } else if (userSelectedTags.page2.length === 0) {
+            updateDisplay('⚠️ 请选择配套', '至少选择一项附加配套', false);
+        }
+    });
+}
+
+function restartAll() {
+    resultArea.classList.remove('show');
+    resultArea.classList.add('hidden');
+    userSelectedTags = { page1: [], page2: [] };
+    currentPage = 1;
+    isGachaAnimating = false;
+    // 重置显示记录
+    displayedParkIds = [];
+    totalDisplayedCount = 0;
+    renderQuiz();
+    updateDisplay('设施扭蛋机', '选择需要的设施即可扭蛋', false);
+    setLeds('off');
+    setButtonEnabled(false);
+    updateEggPoolCount(0);
+}
+
+// ==================== 页面初始化 ====================
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.fade-up').forEach((el, i) => setTimeout(() => el.classList.add('active'), i * 100));
+    
+    // 加载数据
+    loadParksFromDB();
+    
+    // 按钮事件
+    gachaBtn.addEventListener('click', performGacha);
+    restartGachaBtn.addEventListener('click', restartAll);
+    
+    // 初始显示
+    renderQuiz();
+    updateDisplay('设施扭蛋机', '选择需要的设施即可扭蛋', false);
+    setLeds('off');
+    setButtonEnabled(false);
+    updateEggPoolCount(0);
+});
+</script>
+</body>
+</html>
